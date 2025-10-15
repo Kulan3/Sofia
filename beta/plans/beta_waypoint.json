@@ -1,0 +1,270 @@
+{
+    "wp": [
+        {
+            "dist_cm": 180,
+            "dist_px": 60,
+            "angle_deg": 0,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 33,
+            "turn_signed_deg": -33
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 90,
+            "turn_signed_deg": -90
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 90,
+            "turn_signed_deg": -90
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 90,
+            "turn_signed_deg": 90
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 90,
+            "turn_signed_deg": 90
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 90,
+            "turn_signed_deg": -90
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 90,
+            "turn_signed_deg": -90
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 60,
+            "dist_px": 20,
+            "angle_deg": 180,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 170,
+            "dist_px": 57,
+            "angle_deg": 28,
+            "turn_signed_deg": -28
+        }
+    ],
+    "pos": [
+        [
+            380,
+            360
+        ],
+        [
+            330,
+            327
+        ],
+        [
+            350,
+            327
+        ],
+        [
+            370,
+            327
+        ],
+        [
+            390,
+            327
+        ],
+        [
+            410,
+            327
+        ],
+        [
+            430,
+            327
+        ],
+        [
+            430,
+            347
+        ],
+        [
+            410,
+            347
+        ],
+        [
+            390,
+            347
+        ],
+        [
+            370,
+            347
+        ],
+        [
+            350,
+            347
+        ],
+        [
+            330,
+            347
+        ],
+        [
+            330,
+            367
+        ],
+        [
+            350,
+            367
+        ],
+        [
+            370,
+            367
+        ],
+        [
+            390,
+            367
+        ],
+        [
+            410,
+            367
+        ],
+        [
+            430,
+            367
+        ],
+        [
+            430,
+            387
+        ],
+        [
+            410,
+            387
+        ],
+        [
+            390,
+            387
+        ],
+        [
+            370,
+            387
+        ],
+        [
+            350,
+            387
+        ],
+        [
+            330,
+            387
+        ],
+        [
+            380,
+            360
+        ]
+    ],
+    "meta": {
+        "mode": "GRID",
+        "speed_cm_s": 30,
+        "height_cm": 90,
+        "cm_per_px": 3.0,
+        "center_px": [
+            380,
+            360
+        ]
+    }
+}
