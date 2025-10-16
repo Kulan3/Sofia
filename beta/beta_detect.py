@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import os, time
+import os, time, threading
+from pathlib import Path
 import cv2
 import numpy as np
 from ultralytics import YOLO
@@ -10,13 +11,14 @@ class FireDetection:
     """
     Simple container for one-frame detection result.
     """
-    def __init__(self, has_fire: bool, dx=0.0, dy=0.0, area_frac=0.0, conf=0.0, bbox=None):
+    def __init__(self, has_fire: bool, dx=0.0, dy=0.0, area_frac=0.0, conf=0.0, bbox=None, ts: float | None = None):
         self.has_fire  = bool(has_fire)
         self.dx        = float(dx)          # + right of center, - left of center
         self.dy        = float(dy)          # + below center, - above center
         self.area_frac = float(area_frac)   # bbox area fraction of frame (0..1)
         self.conf      = float(conf)
         self.bbox      = bbox               # (x1,y1,x2,y2) or None
+        self.ts        = float(time.time() if ts is None else ts)
 
 class FireDetector:
     """
@@ -29,13 +31,23 @@ class FireDetector:
         self.show_video   = (C.SHOW_VIDEO if show_video is None else bool(show_video))
 
         self.model = None
+        self.model_path = Path(C.YOLO_MODEL_PATH)
+        self._expect_rgb = bool(getattr(C, "TELLO_FRAME_RGB", False))
         if self.enable_model:
-            self.model = YOLO(C.YOLO_MODEL_PATH, task="detect")
+            if not self.model_path.exists():
+                raise FileNotFoundError(f"YOLO model not found at {self.model_path}")
+            self.model = YOLO(str(self.model_path), task="detect")
 
         self.classes = set(C.DETECT_CLASSES) if C.DETECT_CLASSES else None
         self.window_name = "Tello Live"
         self.last_seen_ts = 0.0
         self._vw = None  # VideoWriter
+        self._lock = threading.Lock()
+        self._last_detection = FireDetection(False)
+        self._async_thread: threading.Thread | None = None
+        self._async_stop = threading.Event()
+        self._frame_supplier = None
+        self._poll_interval = 0.05
 
     def _ensure_vwriter(self, frame_shape):
         if not C.VIDEO_SAVE_PATH:
@@ -77,23 +89,30 @@ class FireDetector:
             if self._vw is not None:
                 self._vw.write(frame_bgr)
 
-    def infer(self, frame_bgr) -> FireDetection:
+    def infer(self, frame) -> FireDetection:
         """
         Process one frame. Returns FireDetection.
         - If model is disabled or frame is None: show-only, returns has_fire=False.
         """
-        if frame_bgr is None:
-            # nothing to show or process
-            return FireDetection(False)
+        if frame is None:
+            det = FireDetection(False)
+            self._update_last(det)
+            return det
+
+        if self._expect_rgb and isinstance(frame, np.ndarray) and frame.ndim == 3 and frame.shape[2] == 3:
+            frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        else:
+            frame_bgr = frame
 
         H, W = frame_bgr.shape[:2]
-        # If frame size differs from config, don’t resize forcibly; compute center from actual size
+        # If frame size differs from config, don't resize forcibly; compute center from actual size
         cx, cy = W / 2.0, H / 2.0
 
         if (not self.enable_model) or (self.model is None):
             # show-only path
             det = FireDetection(False)
             self._annotate_and_show(frame_bgr.copy(), det)
+            self._update_last(det)
             return det
 
         # Run YOLO
@@ -127,6 +146,7 @@ class FireDetector:
             det = FireDetection(False)
 
         self._annotate_and_show(frame_bgr.copy(), det)
+        self._update_last(det)
         return det
 
     # Convenience if some code wants offsets after last infer()
@@ -136,6 +156,7 @@ class FireDetector:
         return (det.dx, det.dy, det.area_frac, det.conf)
 
     def close(self):
+        self.stop_async()
         if self._vw is not None:
             try:
                 self._vw.release()
@@ -147,6 +168,63 @@ class FireDetector:
                 cv2.destroyWindow(self.window_name)
         except:
             pass
+
+    def _update_last(self, det: FireDetection):
+        with self._lock:
+            self._last_detection = det
+
+    def get_latest_detection(self, max_age: float | None = None) -> FireDetection | None:
+        with self._lock:
+            det = self._last_detection
+        if det is None:
+            return None
+        if max_age is not None and (time.time() - det.ts) > max_age:
+            return None
+        return det
+
+    def start_async(self, frame_supplier, poll_interval: float | None = None):
+        if frame_supplier is None:
+            return
+        if self._async_thread and self._async_thread.is_alive():
+            return
+        hz = float(getattr(C, "ASYNC_FRAME_HZ", 0) or 0)
+        base = poll_interval if poll_interval else (1.0 / hz if hz > 0 else 0.05)
+        self._poll_interval = max(0.02, min(base, 0.5))
+        self._frame_supplier = frame_supplier
+        self._async_stop.clear()
+        self._async_thread = threading.Thread(target=self._async_loop, name="fire-detector", daemon=True)
+        self._async_thread.start()
+
+    def pause_async(self):
+        if not self._async_thread:
+            return
+        self._async_stop.set()
+        self._async_thread.join(timeout=1.0)
+        self._async_thread = None
+        self._async_stop.clear()
+
+    def resume_async(self):
+        if self._frame_supplier is None:
+            return
+        self.start_async(self._frame_supplier, self._poll_interval)
+
+    def stop_async(self):
+        self.pause_async()
+        self._frame_supplier = None
+
+    def _async_loop(self):
+        while not self._async_stop.is_set():
+            frame = None
+            try:
+                frame = self._frame_supplier()
+            except Exception:
+                frame = None
+            if frame is not None:
+                try:
+                    self.infer(frame)
+                except Exception:
+                    pass
+            time.sleep(self._poll_interval)
 
 
 def approach_once(tello, det: FireDetection) -> float:
