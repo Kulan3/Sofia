@@ -1,0 +1,80 @@
+{
+    "wp": [
+        {
+            "dist_cm": 350,
+            "dist_px": 117,
+            "angle_deg": 0,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 499,
+            "dist_px": 166,
+            "angle_deg": 63,
+            "turn_signed_deg": 63
+        },
+        {
+            "dist_cm": 945,
+            "dist_px": 315,
+            "angle_deg": 119,
+            "turn_signed_deg": 119
+        },
+        {
+            "dist_cm": 534,
+            "dist_px": 178,
+            "angle_deg": 64,
+            "turn_signed_deg": 64
+        },
+        {
+            "dist_cm": 823,
+            "dist_px": 274,
+            "angle_deg": 152,
+            "turn_signed_deg": 152
+        },
+        {
+            "dist_cm": 426,
+            "dist_px": 142,
+            "angle_deg": 127,
+            "turn_signed_deg": 127
+        }
+    ],
+    "pos": [
+        [
+            350,
+            350
+        ],
+        [
+            434,
+            269
+        ],
+        [
+            277,
+            214
+        ],
+        [
+            42,
+            424
+        ],
+        [
+            207,
+            491
+        ],
+        [
+            480,
+            465
+        ],
+        [
+            554,
+            344
+        ]
+    ],
+    "meta": {
+        "mode": "FREE",
+        "speed_cm_s": 30,
+        "height_cm": 90,
+        "cm_per_px": 3.0,
+        "center_px": [
+            350,
+            350
+        ]
+    }
+}
