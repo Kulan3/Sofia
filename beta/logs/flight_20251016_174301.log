@@ -1,0 +1,5 @@
+2025-10-16 17:43:01,271 INFO Logging to logs/flight_20251016_174301.log
+2025-10-16 17:43:01,272 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-16 17:43:01,274 INFO Connecting (attempt 1/4)...
+2025-10-16 17:43:01,378 INFO Battery 49%
+2025-10-16 17:43:01,582 INFO Takeoff.

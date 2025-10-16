@@ -1,0 +1,86 @@
+2025-10-16 17:57:33,995 INFO Logging to logs/flight_20251016_175733.log
+2025-10-16 17:57:33,995 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-16 17:57:33,996 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-16 17:57:33,997 INFO Connecting (attempt 1/4)...
+2025-10-16 17:57:33,998 INFO Send command: 'command'
+2025-10-16 17:57:34,100 INFO Response command: 'ok'
+2025-10-16 17:57:34,101 INFO Battery 60%
+2025-10-16 17:57:34,104 INFO Send command: 'streamon'
+2025-10-16 17:57:34,206 INFO Response streamon: 'ok'
+2025-10-16 17:57:34,208 INFO Send command: 'speed 30'
+2025-10-16 17:57:34,310 INFO Response speed 30: 'ok'
+2025-10-16 17:57:34,311 INFO Takeoff.
+2025-10-16 17:57:34,315 INFO Send command: 'takeoff'
+2025-10-16 17:57:40,452 INFO Response takeoff: 'ok'
+2025-10-16 17:57:40,953 INFO Hovering for IMU stabilization (2.0s).
+2025-10-16 17:57:42,955 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-16 17:57:42,956 INFO Send command: 'up 40'
+2025-10-16 17:57:45,369 INFO Response up 40: 'ok'
+2025-10-16 17:57:45,571 INFO Send command: 'up 30'
+2025-10-16 17:57:47,985 INFO Response up 30: 'ok'
+2025-10-16 17:57:48,186 INFO [0] turn -1 deg
+2025-10-16 17:57:48,186 WARNING turn -1 deg below MIN_TURN_DEG (2); skipping.
+2025-10-16 17:57:48,187 INFO [0] forward total 153 cm
+2025-10-16 17:57:48,187 INFO Send command: 'forward 60'
+2025-10-16 17:57:51,104 INFO Response forward 60: 'ok'
+2025-10-16 17:57:53,496 INFO Send command: 'forward 60'
+2025-10-16 17:57:56,411 INFO Response forward 60: 'ok'
+2025-10-16 17:57:56,668 INFO Send command: 'forward 33'
+2025-10-16 17:57:58,278 INFO Response forward 33: 'ok'
+2025-10-16 17:57:58,486 INFO [1] turn +91 deg
+2025-10-16 17:57:58,487 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-16 17:57:58,688 INFO     turn chunk 1: CCW 45 deg (rem 46)
+2025-10-16 17:57:58,689 INFO Send command: 'ccw 45'
+2025-10-16 17:58:00,098 INFO Response ccw 45: 'ok'
+2025-10-16 17:58:00,300 INFO     turn chunk 2: CCW 45 deg (rem 1)
+2025-10-16 17:58:00,301 INFO Send command: 'ccw 45'
+2025-10-16 17:58:01,710 INFO Response ccw 45: 'ok'
+2025-10-16 17:58:01,913 INFO     turn chunk 3: CCW 1 deg (rem 0)
+2025-10-16 17:58:01,914 INFO Send command: 'ccw 1'
+2025-10-16 17:58:02,014 INFO Response ccw 1: 'ok'
+2025-10-16 17:58:02,215 INFO [1] forward total 141 cm
+2025-10-16 17:58:02,216 INFO Send command: 'forward 60'
+2025-10-16 17:58:05,139 INFO Response forward 60: 'ok'
+2025-10-16 17:58:05,350 INFO Send command: 'forward 60'
+2025-10-16 17:58:08,269 INFO Response forward 60: 'ok'
+2025-10-16 17:58:08,473 INFO Send command: 'forward 21'
+2025-10-16 17:58:10,085 INFO Response forward 21: 'ok'
+2025-10-16 17:58:10,299 INFO [2] turn +90 deg
+2025-10-16 17:58:10,299 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-16 17:58:10,500 INFO     turn chunk 1: CCW 45 deg (rem 45)
+2025-10-16 17:58:10,501 INFO Send command: 'ccw 45'
+2025-10-16 17:58:11,913 INFO Response ccw 45: 'ok'
+2025-10-16 17:58:12,114 INFO     turn chunk 2: CCW 45 deg (rem 0)
+2025-10-16 17:58:12,115 INFO Send command: 'ccw 45'
+2025-10-16 17:58:13,526 INFO Response ccw 45: 'ok'
+2025-10-16 17:58:13,729 INFO [2] forward total 150 cm
+2025-10-16 17:58:13,729 INFO Send command: 'forward 60'
+2025-10-16 17:58:16,748 INFO Response forward 60: 'ok'
+2025-10-16 17:58:16,966 INFO Send command: 'forward 60'
+2025-10-16 17:58:19,885 INFO Response forward 60: 'ok'
+2025-10-16 17:58:20,099 INFO Send command: 'forward 30'
+2025-10-16 17:58:21,712 INFO Response forward 30: 'ok'
+2025-10-16 17:58:21,918 INFO [3] turn +91 deg
+2025-10-16 17:58:21,919 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-16 17:58:22,120 INFO     turn chunk 1: CCW 45 deg (rem 46)
+2025-10-16 17:58:22,120 INFO Send command: 'ccw 45'
+2025-10-16 17:58:23,501 INFO Response ccw 45: 'ok'
+2025-10-16 17:58:23,703 INFO     turn chunk 2: CCW 45 deg (rem 1)
+2025-10-16 17:58:23,703 INFO Send command: 'ccw 45'
+2025-10-16 17:58:25,214 INFO Response ccw 45: 'ok'
+2025-10-16 17:58:25,416 INFO     turn chunk 3: CCW 1 deg (rem 0)
+2025-10-16 17:58:25,417 INFO Send command: 'ccw 1'
+2025-10-16 17:58:25,519 INFO Response ccw 1: 'ok'
+2025-10-16 17:58:25,720 INFO [3] forward total 144 cm
+2025-10-16 17:58:25,721 INFO Send command: 'forward 60'
+2025-10-16 17:58:28,947 INFO Response forward 60: 'ok'
+2025-10-16 17:58:29,166 INFO Send command: 'forward 60'
+2025-10-16 17:58:32,183 INFO Response forward 60: 'ok'
+2025-10-16 17:58:32,392 INFO Send command: 'forward 24'
+2025-10-16 17:58:34,511 INFO Response forward 24: 'ok'
+2025-10-16 17:58:34,717 INFO Mission complete. Landing.
+2025-10-16 17:58:34,717 INFO Send command: 'land'
+2025-10-16 17:58:39,648 INFO Response land: 'ok'
+2025-10-16 17:58:39,672 INFO Send command: 'streamoff'
+2025-10-16 17:58:39,773 INFO Response streamoff: 'ok'
+2025-10-16 17:58:39,774 INFO Done.

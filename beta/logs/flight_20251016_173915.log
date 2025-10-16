@@ -1,0 +1,18 @@
+2025-10-16 17:39:15,328 INFO Logging to logs/flight_20251016_173915.log
+2025-10-16 17:39:15,329 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-16 17:39:15,330 INFO Connecting (attempt 1/4)...
+2025-10-16 17:39:15,484 INFO Battery 89%
+2025-10-16 17:39:15,742 INFO Takeoff.
+2025-10-16 17:39:25,101 INFO Hovering for IMU stabilization (2.0s).
+2025-10-16 17:39:27,103 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-16 17:39:32,341 INFO [0] turn -1 deg
+2025-10-16 17:39:32,342 WARNING turn -1 deg below MIN_TURN_DEG (2); skipping.
+2025-10-16 17:39:32,342 INFO [0] forward total 153 cm
+2025-10-16 17:39:47,766 INFO [1] turn +91 deg
+2025-10-16 17:39:47,967 INFO     turn chunk 1: CCW 45 deg (rem 46)
+2025-10-16 17:39:49,579 INFO     turn chunk 2: CCW 45 deg (rem 1)
+2025-10-16 17:39:51,191 INFO     turn chunk 3: CCW 1 deg (rem 0)
+2025-10-16 17:39:51,495 INFO [1] forward total 141 cm
+2025-10-16 17:40:03,191 WARNING move_forward failed (Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 1/5 (IMU not ready).
+2025-10-16 17:40:16,946 ERROR KeyboardInterrupt - landing
+2025-10-16 17:40:16,947 WARNING land error: [WinError 10051] A socket operation was attempted to an unreachable network
