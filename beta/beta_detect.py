@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-<<<<<<< Updated upstream
 import os, time, threading
-=======
-import os, time
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 from pathlib import Path
 import cv2
 import numpy as np
@@ -39,13 +32,7 @@ class FireDetector:
 
         self.model = None
         self.model_path = Path(C.YOLO_MODEL_PATH)
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         self._expect_rgb = bool(getattr(C, "TELLO_FRAME_RGB", False))
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         if self.enable_model:
             if not self.model_path.exists():
                 raise FileNotFoundError(f"YOLO model not found at {self.model_path}")
@@ -83,7 +70,7 @@ class FireDetector:
             cv2.rectangle(frame_bgr, (x1, y1), (x2, y2), (0,0,255), 2)
             label = f"C.DETECT_CLASSES {det.conf:.2f} | dx={det.dx:.0f} dy={det.dy:.0f} area={det.area_frac:.2f}"
         else:
-            label = 'no' + C.DETECT_CLASSES
+            label = 'no ' + C.DETECT_CLASSES
         cv2.putText(frame_bgr, label, (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (40,40,40), 2)
 
         if self.show_video:
