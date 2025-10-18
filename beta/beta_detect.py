@@ -4,6 +4,9 @@
 import os, time, threading
 =======
 import os, time
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 from pathlib import Path
 import cv2
@@ -37,7 +40,10 @@ class FireDetector:
         self.model = None
         self.model_path = Path(C.YOLO_MODEL_PATH)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         self._expect_rgb = bool(getattr(C, "TELLO_FRAME_RGB", False))
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
         if self.enable_model:
