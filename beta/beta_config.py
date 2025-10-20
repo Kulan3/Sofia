@@ -80,7 +80,7 @@ APPROACH_MAX_STEPS = 15      # failsafe: avoid infinite approach in policy 2
 HOLD_SECS          = 6.0     # dwell time near fire (policy 2)
 
 # Optional recording (set path or None)
-VIDEO_SAVE_PATH    = None    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
+VIDEO_SAVE_PATH    = "C:\Users\nutth\Videos\Drone\Fly_Test.mp4"    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
 VIDEO_FPS          = 40
 VIDEO_CODEC        = "mp4v"
 TELLO_FRAME_RGB    = True    # djitellopy returns RGB frames by default
