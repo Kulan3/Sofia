@@ -47,18 +47,159 @@ def _is_imu_error(exc: Exception) -> bool:
     return "no valid imu" in msg or "not joystick" in msg
 
 
+def _is_timeout_error(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return "did not receive a response" in msg or "max retries exceeded" in msg
+
+
+def _needs_command_recover(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    if not msg:
+        return False
+    return (
+        "unknown command" in msg
+        or "invalid continuation byte" in msg
+        or "utf-8 codec" in msg
+        or "utf8" in msg
+        or "did not receive a response" in msg
+        or "aborting command" in msg
+    )
+
+
+def _state_height_cm(t: Tello) -> float | None:
+    try:
+        state = t.get_current_state()
+        if not state:
+            return None
+        h = state.get("h")
+        if h is None:
+            return None
+        return float(h)
+    except Exception:
+        return None
+
+
+def _capture_command_snapshot(t: Tello | None, label: str):
+    if not isinstance(t, Tello):
+        return None
+    if label in ("takeoff", "land", "move_up", "move_down"):
+        return {"h": _state_height_cm(t)}
+    return None
+
+
+def _command_effect_seen(
+    t: Tello | None,
+    label: str,
+    before: dict | None,
+    args,
+) -> bool:
+    if not isinstance(t, Tello) or before is None:
+        return False
+    tol = float(getattr(C, "COMMAND_SUCCESS_TOL_CM", 10.0))
+    now = _capture_command_snapshot(t, label)
+    if not now:
+        return False
+    if label == "takeoff":
+        h_now = now.get("h")
+        if h_now is None:
+            return False
+        return h_now >= float(getattr(C, "TAKEOFF_SUCCESS_HEIGHT_CM", 30.0))
+    if label == "land":
+        h_now = now.get("h")
+        if h_now is None:
+            return False
+        return h_now <= tol
+    if label in ("move_up", "move_down"):
+        h_before = before.get("h")
+        h_now = now.get("h")
+        if h_before is None or h_now is None:
+            return False
+        target = float(args[0]) if args else 0.0
+        delta = h_now - h_before
+        if label == "move_up":
+            return delta >= max(0.0, target - tol)
+        return delta <= -max(0.0, target - tol)
+    return False
+
+
+def _command_pad_seconds(label: str, args) -> float:
+    cfg = getattr(C, "COMMAND_TIMEOUT_PAD", {})
+    entry = cfg.get(label)
+    if entry is None:
+        return 0.0
+    if isinstance(entry, (int, float)):
+        return float(entry)
+    base = float(entry.get("base", 0.0) or 0.0)
+    per_cm = float(entry.get("per_cm", 0.0) or 0.0)
+    dist_cm = 0.0
+    if args:
+        try:
+            dist_cm = float(args[0])
+        except Exception:
+            dist_cm = 0.0
+    pad = base + per_cm * abs(dist_cm)
+    return max(0.0, pad)
+
+
+def ensure_command_mode(t: Tello, *, log_recover: bool = True) -> bool:
+    try:
+        resp = t.send_command_with_return("command")
+        if isinstance(resp, str):
+            resp_l = resp.lower()
+            if resp_l not in ("ok", "ack", "ready"):
+                log_w(f"Re-entered command mode, response: {resp}")
+        if log_recover:
+            log_w("Sent 'command' to re-sync SDK mode.")
+        time.sleep(0.2)
+        return True
+    except Exception as e:
+        if log_recover:
+            log_w(f"command-mode recovery failed: {e}")
+        return False
+
+
 def try_cmd(fn, *args, retries=C.RETRIES, sleep=C.RETRY_SLEEP, label="cmd"):
     attempts = 0
     base_attempts = retries + 1
     extra_imu = max(0, getattr(C, "IMU_RECOVER_MAX", 0))
     max_attempts = base_attempts
+    t_obj = getattr(fn, "__self__", None)
 
     while True:
+        snapshot = _capture_command_snapshot(t_obj, label)
+        timeout_override_applied = False
+        original_timeout = None
+        pad_seconds = _command_pad_seconds(label, args)
+        if pad_seconds > 0 and isinstance(t_obj, Tello):
+            try:
+                original_timeout = t_obj.RESPONSE_TIMEOUT
+                t_obj.RESPONSE_TIMEOUT = original_timeout + pad_seconds
+                timeout_override_applied = True
+            except Exception:
+                timeout_override_applied = False
         try:
-            return fn(*args)
+            result = fn(*args)
+            return result
         except Exception as e:
             attempts += 1
             imu_err = _is_imu_error(e)
+            timeout_err = _is_timeout_error(e)
+            if timeout_override_applied and isinstance(t_obj, Tello):
+                t_obj.RESPONSE_TIMEOUT = original_timeout
+                timeout_override_applied = False
+            if timeout_err and _command_effect_seen(t_obj, label, snapshot, args):
+                log_w(f"{label} timeout but state indicates completion; skipping retries.")
+                return None
+            if _needs_command_recover(e):
+                t_obj = getattr(fn, "__self__", None)
+                if isinstance(t_obj, Tello):
+                    recovered = ensure_command_mode(t_obj)
+                    if recovered:
+                        log_w(f"{label} retrying after command-mode recovery ({attempts}/{max_attempts-1}).")
+                        time.sleep(sleep)
+                        if attempts < max_attempts:
+                            continue
+                # fall through if not recovered
             if imu_err and max_attempts == base_attempts:
                 max_attempts += extra_imu
             if attempts < max_attempts:
@@ -69,6 +210,76 @@ def try_cmd(fn, *args, retries=C.RETRIES, sleep=C.RETRY_SLEEP, label="cmd"):
             else:
                 log_e(f"{label} failed after {max_attempts} tries: {e}")
                 raise
+        finally:
+            if timeout_override_applied and isinstance(t_obj, Tello):
+                t_obj.RESPONSE_TIMEOUT = original_timeout
+
+
+def _normalize_yaw(deg: float) -> float:
+    while deg > 180.0:
+        deg -= 360.0
+    while deg <= -180.0:
+        deg += 360.0
+    return deg
+
+
+def get_current_yaw(t: Tello) -> float | None:
+    try:
+        state = t.get_current_state()
+        if not state:
+            return None
+        yaw = state.get("yaw")
+        if yaw is None:
+            return None
+        return float(yaw)
+    except Exception as e:
+        log_w(f"get_current_state error: {e}")
+        return None
+
+
+def correct_heading_if_needed(t: Tello, expected_yaw: float) -> float:
+    tol = float(getattr(C, "DRIFT_HEADING_TOL_DEG", 0) or 0)
+    if tol <= 0:
+        return expected_yaw
+    actual = get_current_yaw(t)
+    if actual is None:
+        return expected_yaw
+    diff = _normalize_yaw(actual - expected_yaw)
+    if abs(diff) < tol:
+        return expected_yaw
+    max_c = float(getattr(C, "DRIFT_CORRECT_MAX_DEG", tol) or tol)
+    step = max(-max_c, min(max_c, diff))
+    log_w(f"Heading drift detected: actual {actual:+.1f}°, expected {expected_yaw:+.1f}° -> correcting {-step:+.1f}°")
+    rotate_signed_deg(t, -step)
+    updated = get_current_yaw(t)
+    if updated is not None:
+        return _normalize_yaw(updated)
+    return _normalize_yaw(expected_yaw - step)
+
+
+def fallback_rc_descent(t: Tello):
+    log_w("Attempting RC descent fallback.")
+    try:
+        t.send_rc_control(0, 0, -20, 0)
+        time.sleep(2.5)
+        t.send_rc_control(0, 0, 0, 0)
+    except Exception as e:
+        log_e(f"RC descent fallback failed: {e}; issuing emergency stop.")
+        try:
+            t.emergency()
+        except Exception as ee:
+            log_e(f"Emergency command failed: {ee}")
+
+
+def safe_land(t: Tello):
+    try:
+        try_cmd(t.land, label="land")
+        return
+    except Exception as e:
+        log_w(f"land error: {e}")
+    if not ensure_command_mode(t, log_recover=True):
+        log_w("Unable to re-enter command mode before RC descent.")
+    fallback_rc_descent(t)
 
 
 def rotate_signed_deg(t: Tello, ang_deg: float):
@@ -141,17 +352,26 @@ def rc_yaw_fallback(t: Tello, step_deg: int) -> bool:
 
 
 # ------------- Detection policies -------------
-def do_policy_v1_hold_until_lost(t: Tello, det: FireDetector):
+def do_policy_v1_hold_until_lost(
+    t: Tello,
+    det: FireDetector,
+    frame_supplier,
+    initial_det: FireDetection | None = None,
+):
     log_i("V1: FIRE detected -> approaching; resume after target is lost.")
     t.send_rc_control(0,0,0,0); t.hover(); time.sleep(0.1)
     last_seen = time.time()
+    current = initial_det if (initial_det and initial_det.has_fire) else None
+    if current:
+        last_seen = current.ts
     while True:
-        frame = t.get_frame_read().frame if hasattr(t, "get_frame_read") else None
-        d = det.infer(frame)
-        if d.has_fire:
+        if current is None:
+            frame = frame_supplier() if frame_supplier else None
+            current = det.infer(frame)
+        if current.has_fire:
             last_seen = time.time()
             try:
-                approach_once(t, d)
+                approach_once(t, current)
             except Exception as e:
                 log_w(f"approach_once error: {e}")
         else:
@@ -159,21 +379,31 @@ def do_policy_v1_hold_until_lost(t: Tello, det: FireDetector):
                 log_i("V1: Fire lost -> resuming mission.")
                 break
         time.sleep(0.05)
+        current = None
 
 
-def do_policy_v2_approach_then_hold(t: Tello, det: FireDetector):
+def do_policy_v2_approach_then_hold(
+    t: Tello,
+    det: FireDetector,
+    frame_supplier,
+    initial_det: FireDetection | None = None,
+):
     log_i(f"V2: FIRE detected -> approach then dwell {C.HOLD_SECS:.1f}s.")
     t.send_rc_control(0,0,0,0); t.hover(); time.sleep(0.1)
     last_seen = None
     steps = 0
+    current = initial_det if (initial_det and initial_det.has_fire) else None
+    if current:
+        last_seen = current.ts
     while True:
-        frame = t.get_frame_read().frame if hasattr(t, "get_frame_read") else None
-        d = det.infer(frame)
-        if d.has_fire:
+        if current is None:
+            frame = frame_supplier() if frame_supplier else None
+            current = det.infer(frame)
+        if current.has_fire:
             last_seen = time.time()
             if steps < C.APPROACH_MAX_STEPS:
                 try:
-                    approach_once(t, d)
+                    approach_once(t, current)
                     steps += 1
                 except Exception as e:
                     log_w(f"approach_once error: {e}")
@@ -185,6 +415,7 @@ def do_policy_v2_approach_then_hold(t: Tello, det: FireDetector):
             log_i("V2: Hold complete -> resuming mission.")
             break
         time.sleep(0.05)
+        current = None
 
 
 def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
@@ -195,6 +426,18 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
     log_i(f"Altitude {ALT_CM} cm, speed {SPEED_CM_S} cm/s, AI={'ON' if ai_enabled else 'OFF'} policy={policy_label}")
 
     t = Tello()
+    try:
+        timeout_override = float(getattr(C, "RESPONSE_TIMEOUT_S", t.RESPONSE_TIMEOUT))
+        if timeout_override > 0:
+            t.RESPONSE_TIMEOUT = timeout_override
+    except Exception:
+        pass
+    try:
+        retry_override = int(getattr(C, "COMMAND_RETRY_COUNT", t.retry_count))
+        if retry_override > 0:
+            t.retry_count = retry_override
+    except Exception:
+        pass
 
     ok = False
     for attempt in range(1, C.CONNECT_RETRIES + 1):
@@ -212,12 +455,27 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
         log_e("Unable to connect. Check TELLO Wi-Fi / power / close other Tello apps.")
         return 3
 
+    expected_yaw = get_current_yaw(t)
+    if expected_yaw is None:
+        expected_yaw = 0.0
+    else:
+        expected_yaw = _normalize_yaw(expected_yaw)
+
     need_detector = ai_enabled or show_video
     stream_active = False
+    frame_supplier = None
+    frame_read = None
     if need_detector:
         try:
             t.streamon()
             stream_active = True
+            if hasattr(t, "get_frame_read"):
+                frame_read = t.get_frame_read()
+
+                def _supply_frame(fr=frame_read):
+                    return fr.frame
+
+                frame_supplier = _supply_frame
         except Exception as e:
             log_w(f"streamon error - disabling AI/show-video: {e}")
             if ai_enabled:
@@ -225,6 +483,7 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
             if show_video:
                 show_video = False
             need_detector = False
+            frame_supplier = None
 
     try:
         t.set_speed(SPEED_CM_S)
@@ -264,8 +523,17 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
             time.sleep(C.MOVE_SLEEP)
 
     detector = None
-    if need_detector:
+    if need_detector and frame_supplier:
         detector = FireDetector(enable_model=ai_enabled, show_video=show_video if show_video else None)
+        if ai_enabled:
+            detector.start_async(frame_supplier)
+    elif need_detector:
+        log_w("Stream active but frame source unavailable; live preview/AI disabled.")
+        if ai_enabled:
+            ai_enabled = False
+        if show_video:
+            show_video = False
+        need_detector = False
 
     aborted = False
     try:
@@ -282,6 +550,10 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
             if turn_deg:
                 log_i(f"[{i}] turn {turn_deg:+d} deg")
                 rotate_signed_deg(t, turn_deg)
+                expected_yaw = _normalize_yaw(expected_yaw + turn_deg)
+                actual_after_turn = get_current_yaw(t)
+                if actual_after_turn is not None:
+                    expected_yaw = _normalize_yaw(actual_after_turn)
 
             remaining = int(round(dist_cm))
             log_i(f"[{i}] forward total {remaining} cm")
@@ -294,15 +566,27 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
                     break
                 remaining -= step
                 time.sleep(C.MOVE_SLEEP)
+                expected_yaw = correct_heading_if_needed(t, expected_yaw)
 
                 if detector:
-                    frame = t.get_frame_read().frame if hasattr(t, "get_frame_read") else None
-                    d = detector.infer(frame)
-                    if ai_enabled and d.has_fire:
-                        if mode_version == 1:
-                            do_policy_v1_hold_until_lost(t, detector)
-                        elif mode_version == 2:
-                            do_policy_v2_approach_then_hold(t, detector)
+                    if ai_enabled:
+                        det_snapshot = detector.get_latest_detection(max_age=0.7)
+                        if det_snapshot and det_snapshot.has_fire:
+                            detector.pause_async()
+                            try:
+                                if mode_version == 1:
+                                    do_policy_v1_hold_until_lost(t, detector, frame_supplier, det_snapshot)
+                                elif mode_version == 2:
+                                    do_policy_v2_approach_then_hold(t, detector, frame_supplier, det_snapshot)
+                            finally:
+                                detector.resume_async()
+                            yaw_after_policy = get_current_yaw(t)
+                            if yaw_after_policy is not None:
+                                expected_yaw = _normalize_yaw(yaw_after_policy)
+                    elif show_video and frame_supplier:
+                        frame = frame_supplier()
+                        if frame is not None:
+                            detector.infer(frame)
 
             if C.PAUSE_PER_SEG > 0:
                 time.sleep(C.PAUSE_PER_SEG)
@@ -314,10 +598,7 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
     except Exception as e:
         log_e(f"Runtime error: {e} - landing")
     finally:
-        try:
-            t.land()
-        except Exception as e:
-            log_w(f"land error: {e}")
+        safe_land(t)
         if detector:
             try:
                 detector.close()
