@@ -448,7 +448,7 @@ while running:
     pygame.draw.rect(screen, (250,250,250), (W-PANEL_W, 0, PANEL_W, H))
     pygame.draw.line(screen, (200,200,200), (W-PANEL_W, 0), (W-PANEL_W, H), 1)
     buttons[0].text = "Mode: Free" if mode==MODE_FREE else "Mode: Grid"
-    buttons[2].text = f"Grid Dir: {'X→Y' if GRID_ORIENT=='X' else 'Y→X'}"
+    buttons[2].text = f"Grid Dir: {'X -> Y' if GRID_ORIENT=='X' else 'Y -> X'}"
     for b in buttons: b.draw(screen)
 
     draw_blinks(screen)
