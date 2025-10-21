@@ -47,6 +47,11 @@ def _is_imu_error(exc: Exception) -> bool:
     return "no valid imu" in msg or "not joystick" in msg
 
 
+def _is_timeout_error(exc: Exception) -> bool:
+    msg = str(exc).lower()
+    return "did not receive a response" in msg or "max retries exceeded" in msg
+
+
 def _needs_command_recover(exc: Exception) -> bool:
     msg = str(exc).lower()
     if not msg:
@@ -56,7 +61,84 @@ def _needs_command_recover(exc: Exception) -> bool:
         or "invalid continuation byte" in msg
         or "utf-8 codec" in msg
         or "utf8" in msg
+        or "did not receive a response" in msg
+        or "aborting command" in msg
     )
+
+
+def _state_height_cm(t: Tello) -> float | None:
+    try:
+        state = t.get_current_state()
+        if not state:
+            return None
+        h = state.get("h")
+        if h is None:
+            return None
+        return float(h)
+    except Exception:
+        return None
+
+
+def _capture_command_snapshot(t: Tello | None, label: str):
+    if not isinstance(t, Tello):
+        return None
+    if label in ("takeoff", "land", "move_up", "move_down"):
+        return {"h": _state_height_cm(t)}
+    return None
+
+
+def _command_effect_seen(
+    t: Tello | None,
+    label: str,
+    before: dict | None,
+    args,
+) -> bool:
+    if not isinstance(t, Tello) or before is None:
+        return False
+    tol = float(getattr(C, "COMMAND_SUCCESS_TOL_CM", 10.0))
+    now = _capture_command_snapshot(t, label)
+    if not now:
+        return False
+    if label == "takeoff":
+        h_now = now.get("h")
+        if h_now is None:
+            return False
+        return h_now >= float(getattr(C, "TAKEOFF_SUCCESS_HEIGHT_CM", 30.0))
+    if label == "land":
+        h_now = now.get("h")
+        if h_now is None:
+            return False
+        return h_now <= tol
+    if label in ("move_up", "move_down"):
+        h_before = before.get("h")
+        h_now = now.get("h")
+        if h_before is None or h_now is None:
+            return False
+        target = float(args[0]) if args else 0.0
+        delta = h_now - h_before
+        if label == "move_up":
+            return delta >= max(0.0, target - tol)
+        return delta <= -max(0.0, target - tol)
+    return False
+
+
+def _command_pad_seconds(label: str, args) -> float:
+    cfg = getattr(C, "COMMAND_TIMEOUT_PAD", {})
+    entry = cfg.get(label)
+    if entry is None:
+        return 0.0
+    if isinstance(entry, (int, float)):
+        return float(entry)
+    base = float(entry.get("base", 0.0) or 0.0)
+    per_cm = float(entry.get("per_cm", 0.0) or 0.0)
+    dist_cm = 0.0
+    if args:
+        try:
+            dist_cm = float(args[0])
+        except Exception:
+            dist_cm = 0.0
+    pad = base + per_cm * abs(dist_cm)
+    return max(0.0, pad)
 
 
 def ensure_command_mode(t: Tello, *, log_recover: bool = True) -> bool:
@@ -81,13 +163,33 @@ def try_cmd(fn, *args, retries=C.RETRIES, sleep=C.RETRY_SLEEP, label="cmd"):
     base_attempts = retries + 1
     extra_imu = max(0, getattr(C, "IMU_RECOVER_MAX", 0))
     max_attempts = base_attempts
+    t_obj = getattr(fn, "__self__", None)
 
     while True:
+        snapshot = _capture_command_snapshot(t_obj, label)
+        timeout_override_applied = False
+        original_timeout = None
+        pad_seconds = _command_pad_seconds(label, args)
+        if pad_seconds > 0 and isinstance(t_obj, Tello):
+            try:
+                original_timeout = t_obj.RESPONSE_TIMEOUT
+                t_obj.RESPONSE_TIMEOUT = original_timeout + pad_seconds
+                timeout_override_applied = True
+            except Exception:
+                timeout_override_applied = False
         try:
-            return fn(*args)
+            result = fn(*args)
+            return result
         except Exception as e:
             attempts += 1
             imu_err = _is_imu_error(e)
+            timeout_err = _is_timeout_error(e)
+            if timeout_override_applied and isinstance(t_obj, Tello):
+                t_obj.RESPONSE_TIMEOUT = original_timeout
+                timeout_override_applied = False
+            if timeout_err and _command_effect_seen(t_obj, label, snapshot, args):
+                log_w(f"{label} timeout but state indicates completion; skipping retries.")
+                return None
             if _needs_command_recover(e):
                 t_obj = getattr(fn, "__self__", None)
                 if isinstance(t_obj, Tello):
@@ -108,6 +210,9 @@ def try_cmd(fn, *args, retries=C.RETRIES, sleep=C.RETRY_SLEEP, label="cmd"):
             else:
                 log_e(f"{label} failed after {max_attempts} tries: {e}")
                 raise
+        finally:
+            if timeout_override_applied and isinstance(t_obj, Tello):
+                t_obj.RESPONSE_TIMEOUT = original_timeout
 
 
 def _normalize_yaw(deg: float) -> float:
@@ -321,6 +426,18 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
     log_i(f"Altitude {ALT_CM} cm, speed {SPEED_CM_S} cm/s, AI={'ON' if ai_enabled else 'OFF'} policy={policy_label}")
 
     t = Tello()
+    try:
+        timeout_override = float(getattr(C, "RESPONSE_TIMEOUT_S", t.RESPONSE_TIMEOUT))
+        if timeout_override > 0:
+            t.RESPONSE_TIMEOUT = timeout_override
+    except Exception:
+        pass
+    try:
+        retry_override = int(getattr(C, "COMMAND_RETRY_COUNT", t.retry_count))
+        if retry_override > 0:
+            t.retry_count = retry_override
+    except Exception:
+        pass
 
     ok = False
     for attempt in range(1, C.CONNECT_RETRIES + 1):
@@ -408,7 +525,8 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
     detector = None
     if need_detector and frame_supplier:
         detector = FireDetector(enable_model=ai_enabled, show_video=show_video if show_video else None)
-        detector.start_async(frame_supplier)
+        if ai_enabled:
+            detector.start_async(frame_supplier)
     elif need_detector:
         log_w("Stream active but frame source unavailable; live preview/AI disabled.")
         if ai_enabled:
@@ -451,19 +569,24 @@ def main(json_path, mode_version: int, ai_enabled: bool, show_video: bool):
                 expected_yaw = correct_heading_if_needed(t, expected_yaw)
 
                 if detector:
-                    det_snapshot = detector.get_latest_detection(max_age=0.7 if ai_enabled else None)
-                    if ai_enabled and det_snapshot and det_snapshot.has_fire:
-                        detector.pause_async()
-                        try:
-                            if mode_version == 1:
-                                do_policy_v1_hold_until_lost(t, detector, frame_supplier, det_snapshot)
-                            elif mode_version == 2:
-                                do_policy_v2_approach_then_hold(t, detector, frame_supplier, det_snapshot)
-                        finally:
-                            detector.resume_async()
-                        yaw_after_policy = get_current_yaw(t)
-                        if yaw_after_policy is not None:
-                            expected_yaw = _normalize_yaw(yaw_after_policy)
+                    if ai_enabled:
+                        det_snapshot = detector.get_latest_detection(max_age=0.7)
+                        if det_snapshot and det_snapshot.has_fire:
+                            detector.pause_async()
+                            try:
+                                if mode_version == 1:
+                                    do_policy_v1_hold_until_lost(t, detector, frame_supplier, det_snapshot)
+                                elif mode_version == 2:
+                                    do_policy_v2_approach_then_hold(t, detector, frame_supplier, det_snapshot)
+                            finally:
+                                detector.resume_async()
+                            yaw_after_policy = get_current_yaw(t)
+                            if yaw_after_policy is not None:
+                                expected_yaw = _normalize_yaw(yaw_after_policy)
+                    elif show_video and frame_supplier:
+                        frame = frame_supplier()
+                        if frame is not None:
+                            detector.infer(frame)
 
             if C.PAUSE_PER_SEG > 0:
                 time.sleep(C.PAUSE_PER_SEG)

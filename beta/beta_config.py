@@ -32,6 +32,20 @@ RC_YAW_RECOVER_PAUSE = 0.3   # pause after RC yaw fallback before next command (
 CONNECT_RETRIES    = 4       # connect attempts
 CONNECT_BACKOFF    = 1.0     # seconds between connect attempts
 HEALTH_TIMEOUT_S   = 6.0     # seconds to wait for a battery/SDK response after connect
+RESPONSE_TIMEOUT_S = 10.0    # SDK command timeout before retry (default 7s)
+COMMAND_RETRY_COUNT = 4      # base retry_count for djitellopy (default 3)
+COMMAND_TIMEOUT_PAD = {      # extra grace before timeout, optional per-distance scaling
+    "takeoff": {"base": 12.0},
+    "land": {"base": 6.0},
+    "move_up": {"base": 1.0, "per_cm": 0.04},
+    "move_down": {"base": 1.0, "per_cm": 0.04},
+    "move_forward": {"base": 0.8, "per_cm": 0.03},
+    "move_back": {"base": 0.8, "per_cm": 0.03},
+    "move_left": {"base": 0.8, "per_cm": 0.03},
+    "move_right": {"base": 0.8, "per_cm": 0.03},
+}
+COMMAND_SUCCESS_TOL_CM = 10   # tolerance when checking state-based completion
+TAKEOFF_SUCCESS_HEIGHT_CM = 30  # height considered successful takeoff
 
 # =========================
 # Fire Detection Settings
@@ -80,7 +94,7 @@ APPROACH_MAX_STEPS = 15      # failsafe: avoid infinite approach in policy 2
 HOLD_SECS          = 6.0     # dwell time near fire (policy 2)
 
 # Optional recording (set path or None)
-VIDEO_SAVE_PATH    = "C:\Users\nutth\Videos\Drone\Fly_Test.mp4"    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
+VIDEO_SAVE_PATH    = None    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
 VIDEO_FPS          = 40
 VIDEO_CODEC        = "mp4v"
 TELLO_FRAME_RGB    = True    # djitellopy returns RGB frames by default
