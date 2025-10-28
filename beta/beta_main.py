@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import time, sys, argparse, os, logging
@@ -8,6 +10,29 @@ from djitellopy import Tello
 import beta_config as C
 from beta_detect import FireDetector, approach_once, FireDetection
 from beta_plan import PLAN_DIR, load_plan, find_latest_beta_waypoint_json
+
+def _classes_text(self):
+    c = getattr(C, "DETECT_CLASSES", None)
+    if c is None:
+        return ""
+    if isinstance(c, (list, tuple, set)):
+        return ",".join(map(str, c))
+    return str(c)
+
+def _annotate_and_show(self, frame_bgr, det: FireDetection):
+    # Crosshair
+    cx, cy = int(C.FRAME_W/2), int(C.FRAME_H/2)
+    cv2.drawMarker(frame_bgr, (cx, cy), (0, 255, 255), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=2)
+
+    # Box + label
+    if det.bbox is not None:
+        x1, y1, x2, y2 = map(int, det.bbox)
+        cv2.rectangle(frame_bgr, (x1, y1), (x2, y2), (0,0,255), 2)
+        cls_text = self._classes_text()
+        label = f"{cls_text or 'fire'} {det.conf:.2f} | dx={det.dx:.0f} dy={det.dy:.0f} area={det.area_frac:.2f}"
+    else:
+        label = f"no {self._classes_text() or 'fire'}"
+    cv2.putText(frame_bgr, label, (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (40,40,40), 2)
 
 # ------------- Logging -------------
 LOGGER = None
