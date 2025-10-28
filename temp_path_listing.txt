@@ -270,6 +270,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    from djitellopy import Tello  # avoid dependency
+    from djitellopy import Tello  # import lazily to avoid dependency when used as library
 
     raise SystemExit(main())
