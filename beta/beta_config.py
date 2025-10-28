@@ -5,7 +5,7 @@ from pathlib import Path
 # =========================
 
 # Basic Flight
-ALT_CM             = 90      # target height from takeoff (cm)
+ALT_CM             = 60      # target height from takeoff (cm)
 SPEED_CM_S         = 30      # 10-50 (indoors)
 LOW_BATT_RTH       = 20      # % battery threshold (abort at/under this)
 

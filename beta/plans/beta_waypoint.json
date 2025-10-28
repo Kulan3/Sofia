@@ -40,7 +40,7 @@
     "meta": {
         "mode": "FREE",
         "speed_cm_s": 30,
-        "height_cm": 90,
+        "height_cm": 60,
         "cm_per_px": 3.0,
         "center_px": [
             380,
