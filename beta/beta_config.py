@@ -4,9 +4,9 @@ from pathlib import Path
 # Mission & Drone Defaults
 # =========================
 
-# Flight
-ALT_CM             = 90      # target altitude above takeoff (cm)
-SPEED_CM_S         = 30      # 10-50 safe indoors
+# Basic Flight
+ALT_CM             = 90      # target height from takeoff (cm)
+SPEED_CM_S         = 30      # 10-50 (indoors)
 LOW_BATT_RTH       = 20      # % battery threshold (abort at/under this)
 
 # Waypoint execution
@@ -52,7 +52,7 @@ TAKEOFF_SUCCESS_HEIGHT_CM = 30  # height considered successful takeoff
 # =========================
 
 # Global AI switch
-ENABLE_AI          = True
+ENABLE_AI          = False
 
 # Model
 _MODEL_DIR         = Path(__file__).resolve().parent
