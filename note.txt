@@ -23,3 +23,5 @@ ubuntu python
 sudo apt update
 sudo apt install -y python3 python3-pip python3-venv
 python3 --version
+
+python beta_main.py --use-last --ai off --log ""
