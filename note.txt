@@ -25,3 +25,15 @@ sudo apt install -y python3 python3-pip python3-venv
 python3 --version
 
 python beta_main.py --use-last --ai off --log ""
+
+New-NetFirewallRule -DisplayName "Tello UDP 8890 Outbound" `
+  -Direction Outbound -Action Allow -Protocol UDP `
+  -RemoteAddress 192.168.10.1 -RemotePort 8890
+
+
+New-NetFirewallRule -DisplayName "Tello UDP 11111 In" `
+  -Direction Inbound -Action Allow -Protocol UDP -LocalPort 11111
+
+New-NetFirewallRule -DisplayName "Tello UDP 11111 Out" `
+  -Direction Outbound -Action Allow -Protocol UDP `
+  -RemoteAddress 192.168.10.1 -RemotePort 11111
