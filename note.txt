@@ -37,3 +37,38 @@ New-NetFirewallRule -DisplayName "Tello UDP 11111 In" `
 New-NetFirewallRule -DisplayName "Tello UDP 11111 Out" `
   -Direction Outbound -Action Allow -Protocol UDP `
   -RemoteAddress 192.168.10.1 -RemotePort 11111
+
+
+or
+
+sudo apt update
+sudo apt install ufw -y
+sudo ufw enable
+
+# Outbound UDP → 192.168.10.1:8890
+sudo ufw allow out to 192.168.10.1 port 8890 proto udp
+
+# Inbound UDP on local port 11111
+sudo ufw allow in proto udp to any port 11111
+
+# Outbound UDP → 192.168.10.1:11111
+sudo ufw allow out to 192.168.10.1 port 11111 proto udp
+
+sudo ufw status numbered
+
+
+or
+
+# Outbound UDP → 192.168.10.1:8890
+sudo iptables -A OUTPUT -p udp -d 192.168.10.1 --dport 8890 -j ACCEPT
+
+# Inbound UDP on local port 11111
+sudo iptables -A INPUT  -p udp --dport 11111 -j ACCEPT
+
+# Outbound UDP → 192.168.10.1:11111
+sudo iptables -A OUTPUT -p udp -d 192.168.10.1 --dport 11111 -j ACCEPT
+
+
+sudo apt install -y iptables-persistent
+sudo netfilter-persistent save
+
