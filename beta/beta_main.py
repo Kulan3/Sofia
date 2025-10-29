@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Waypoint runner with target engagement behaviour."""
 from __future__ import annotations
 
 import argparse
 import logging
+import math
 import os
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from djitellopy import Tello
 
@@ -17,15 +19,14 @@ import beta_config as C
 from beta_detect import FireDetector, FireDetection
 from beta_plan import PLAN_DIR, find_latest_beta_waypoint_json, load_plan
 
-# --------------------------------------------------------------------------- #
-# Logging helpers
-# --------------------------------------------------------------------------- #
-
 LOGGER: Optional[logging.Logger] = None
+AI_LOGGER: Optional[logging.Logger] = None
 
 
 def init_logging(log_path: Optional[str]) -> None:
-    global LOGGER
+    """Configure mission and AI loggers."""
+    global LOGGER, AI_LOGGER
+
     LOGGER = logging.getLogger("flight")
     LOGGER.setLevel(logging.INFO)
     LOGGER.handlers.clear()
@@ -52,28 +53,51 @@ def init_logging(log_path: Optional[str]) -> None:
         sdk_logger.addHandler(handler)
     sdk_logger.propagate = False
 
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    if log_path:
+        base_dir = os.path.dirname(log_path) or "."
+        base_name = os.path.basename(log_path)
+        if base_name.startswith("flight_"):
+            ai_name = base_name.replace("flight_", "flight_ai_", 1)
+        else:
+            root, ext = os.path.splitext(base_name)
+            ai_name = f"{root}_ai{ext or '.log'}"
+        ai_path = os.path.join(base_dir, ai_name)
+    else:
+        os.makedirs("logs", exist_ok=True)
+        ai_path = os.path.join("logs", f"flight_ai_{timestamp}.log")
+
+    AI_LOGGER = logging.getLogger("flight.ai")
+    AI_LOGGER.setLevel(logging.INFO)
+    AI_LOGGER.handlers.clear()
+    ai_handler = logging.FileHandler(ai_path, encoding="utf-8")
+    ai_handler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+    AI_LOGGER.addHandler(ai_handler)
+    AI_LOGGER.propagate = False
+
 
 def log_i(msg: str) -> None:
-    print("[*] {}".format(msg))
+    print(f"[*] {msg}")
     if LOGGER:
         LOGGER.info(msg)
 
 
 def log_w(msg: str) -> None:
-    print("[!] {}".format(msg))
+    print(f"[!] {msg}")
     if LOGGER:
         LOGGER.warning(msg)
 
 
 def log_e(msg: str) -> None:
-    print("[X] {}".format(msg))
+    print(f"[X] {msg}")
     if LOGGER:
         LOGGER.error(msg)
 
 
-# --------------------------------------------------------------------------- #
-# Command wrappers and telemetry helpers
-# --------------------------------------------------------------------------- #
+def log_ai(msg: str) -> None:
+    if AI_LOGGER:
+        AI_LOGGER.info(msg)
+
 
 def _is_imu_error(exc: Exception) -> bool:
     msg = str(exc).lower()
@@ -101,13 +125,13 @@ def _needs_command_recover(exc: Exception) -> bool:
 
 def _state_height_cm(t: Tello) -> Optional[float]:
     try:
-        data = t.get_current_state()
-        if not data:
+        state = t.get_current_state()
+        if not state:
             return None
-        height = data.get("h")
-        if height is None:
+        h = state.get("h")
+        if h is None:
             return None
-        return float(height)
+        return float(h)
     except Exception:
         return None
 
@@ -238,10 +262,6 @@ def try_cmd(fn, *args, retries=C.RETRIES, sleep=C.RETRY_SLEEP, label: str = "cmd
                 t_obj.RESPONSE_TIMEOUT = original_timeout
 
 
-# --------------------------------------------------------------------------- #
-# Flight helpers
-# --------------------------------------------------------------------------- #
-
 def _normalize_yaw(deg: float) -> float:
     while deg > 180.0:
         deg -= 360.0
@@ -252,10 +272,10 @@ def _normalize_yaw(deg: float) -> float:
 
 def get_current_yaw(t: Tello) -> Optional[float]:
     try:
-        data = t.get_current_state()
-        if not data:
+        state = t.get_current_state()
+        if not state:
             return None
-        yaw = data.get("yaw")
+        yaw = state.get("yaw")
         if yaw is None:
             return None
         return float(yaw)
@@ -276,7 +296,7 @@ def correct_heading_if_needed(t: Tello, expected_yaw: float) -> float:
         return expected_yaw
     max_c = float(getattr(C, "DRIFT_CORRECT_MAX_DEG", tol))
     correction = max(-max_c, min(max_c, diff))
-    log_w("Heading drift: actual {:.1f}°, expected {:.1f}° -> correcting {:.1f}°".format(actual, expected_yaw, -correction))
+    log_w("Heading drift: actual {:.1f}deg, expected {:.1f}deg -> correcting {:.1f}deg".format(actual, expected_yaw, -correction))
     rotate_signed_deg(t, -correction)
     updated = get_current_yaw(t)
     return _normalize_yaw(updated) if updated is not None else _normalize_yaw(expected_yaw - correction)
@@ -375,107 +395,298 @@ def rc_yaw_fallback(t: Tello, step_deg: int) -> bool:
     return success
 
 
-def approach_once(t: Tello, det: FireDetection) -> float:
-    if det is None or not det.has_fire:
+def _estimate_distance_m(detection: FireDetection, spec: Dict[str, Any]) -> Optional[float]:
+    if detection.bbox is None:
+        return None
+    real_width = float(spec.get("real_width_m", 0.0) or 0.0)
+    if real_width <= 0:
+        return None
+    x1, _, x2, _ = detection.bbox
+    box_width_px = float(max(1, x2 - x1))
+    focal_px = (C.FRAME_W / 2.0) / math.tan(math.radians(C.H_FOV_DEG / 2.0))
+    return (real_width * focal_px) / box_width_px
+
+def _pixels_to_yaw_deg(dx: float) -> float:
+    if not C.FRAME_W or not C.H_FOV_DEG:
         return 0.0
-    yaw_applied = 0.0
-    if abs(det.dx) > C.CENTER_TOL_PX:
-        step = int(C.APPROACH_YAW_STEP)
-        yaw = -step if det.dx > 0 else step
-        if yaw > 0:
-            t.rotate_counter_clockwise(yaw)
-        else:
-            t.rotate_clockwise(-yaw)
-        time.sleep(C.TURN_SLEEP)
-        yaw_applied += yaw
-        return yaw_applied
-    if det.area_frac < C.NEAR_AREA_FRAC:
-        t.move_forward(int(C.APPROACH_FWD_CM))
-        time.sleep(C.MOVE_SLEEP)
-    return yaw_applied
+    half_width = C.FRAME_W / 2.0
+    if half_width <= 0:
+        return 0.0
+    return (dx / half_width) * (C.H_FOV_DEG / 2.0)
 
 
-# --------------------------------------------------------------------------- #
-# Detection policies
-# --------------------------------------------------------------------------- #
+def _pixels_to_vertical_cm(dy: float, distance_m: Optional[float]) -> int:
+    if abs(dy) < 1e-3:
+        return 0
+    if C.FRAME_H and C.V_FOV_DEG and distance_m and distance_m > 0:
+        half_height = C.FRAME_H / 2.0
+        if half_height > 0:
+            angle_deg = (dy / half_height) * (C.V_FOV_DEG / 2.0)
+            delta_m = math.tan(math.radians(angle_deg)) * distance_m
+            return int(round(delta_m * 100.0))
+    scale = float(C.VERTICAL_STEP_CM) / float(max(1, C.VERTICAL_TOL_PX))
+    return int(round(dy * scale))
 
-def do_policy_v1_hold_until_lost(
+
+def _pixels_to_strafe_cm(dx: float, distance_m: Optional[float]) -> int:
+    if abs(dx) < 1e-3:
+        return 0
+    if C.FRAME_W and C.H_FOV_DEG and distance_m and distance_m > 0:
+        half_width = C.FRAME_W / 2.0
+        if half_width > 0:
+            angle_deg = (dx / half_width) * (C.H_FOV_DEG / 2.0)
+            lateral_m = math.tan(math.radians(angle_deg)) * distance_m
+            return int(round(lateral_m * 100.0))
+    if not C.FRAME_W:
+        return 0
+    half_width = C.FRAME_W / 2.0
+    if half_width <= 0:
+        return 0
+    ratio = dx / half_width
+    baseline = max(C.MIN_MOVE_CM, int(getattr(C, "APPROACH_STRAFE_CM", C.MIN_MOVE_CM)))
+    return int(round(ratio * baseline))
+
+
+def engage_target(
     t: Tello,
     detector: FireDetector,
-    frame_supplier: Callable[[], Optional[object]],
-    initial_det: Optional[FireDetection] = None,
+    frame_supplier: Callable[[], Optional[Any]],
+    initial_det: FireDetection,
 ) -> None:
-    log_i("V1: FIRE detected -> approaching; resume after target is lost.")
-    t.send_rc_control(0, 0, 0, 0)
-    t.hover()
-    time.sleep(0.1)
-    last_seen = time.time()
-    current = initial_det if (initial_det and initial_det.has_fire) else None
-    if current:
-        last_seen = current.ts
-    while True:
-        if current is None:
-            current = detector.infer(frame_supplier())
-        if current.has_fire:
-            last_seen = time.time()
+    if frame_supplier is None:
+        log_ai("No frame supplier; skipping engagement")
+        return
+
+    label = (initial_det.label or "fire").lower()
+    spec = C.TARGET_SPECS.get(label, C.TARGET_SPECS.get("fire"))
+    if not spec:
+        log_ai("No spec for target '{}'; skipping engagement".format(label))
+        return
+
+    desired_distance_m = float(spec.get("approach_distance_m", 0.3) or 0.3)
+    distance_tol_m = C.APPROACH_DISTANCE_TOL_CM / 100.0
+    log_ai("Engaging target '{}' (conf={:.2f})".format(label, initial_det.conf))
+
+    def pump_preview() -> None:
+        if detector is None or not getattr(detector, "show_video", False) or frame_supplier is None:
+            return
+        try:
+            frame = frame_supplier()
+        except Exception:
+            frame = None
+        if frame is not None:
             try:
-                approach_once(t, current)
-            except Exception as exc:
-                log_w("approach_once error: {}".format(exc))
-        else:
-            if (time.time() - last_seen) * 1000.0 > C.FIRE_LOST_MS:
-                log_i("V1: Fire lost -> resuming mission.")
-                break
-        time.sleep(0.05)
-        current = None
+                detector.infer(frame)
+            except Exception:
+                pass
 
+    def fetch_detection(max_wait_s: float = 0.6, require_target: bool = True) -> Optional[FireDetection]:
+        deadline = time.time() + max(0.0, max_wait_s)
+        det_local: Optional[FireDetection] = None
+        while True:
+            pump_preview()
+            det_local = detector.get_latest_detection(max_age=0.5)
+            if det_local and det_local.has_fire and (det_local.label == label or det_local.label is None):
+                return det_local
+            if not require_target:
+                return det_local
+            if time.time() >= deadline:
+                return None
+            time.sleep(0.05)
 
-def do_policy_v2_approach_then_hold(
-    t: Tello,
-    detector: FireDetector,
-    frame_supplier: Callable[[], Optional[object]],
-    initial_det: Optional[FireDetection] = None,
-) -> None:
-    log_i("V2: FIRE detected -> approach then dwell {:.1f}s.".format(C.HOLD_SECS))
-    t.send_rc_control(0, 0, 0, 0)
-    t.hover()
-    time.sleep(0.1)
-    last_seen = None
-    steps = 0
-    current = initial_det if (initial_det and initial_det.has_fire) else None
-    if current:
-        last_seen = current.ts
-    while True:
-        if current is None:
-            current = detector.infer(frame_supplier())
-        if current.has_fire:
-            last_seen = time.time()
-            if steps < C.APPROACH_MAX_STEPS:
-                try:
-                    approach_once(t, current)
-                    steps += 1
-                except Exception as exc:
-                    log_w("approach_once error: {}".format(exc))
-        else:
-            if last_seen is None:
-                log_i("V2: Fire not re-detected; resuming.")
-                break
-        if last_seen is not None and (time.time() - last_seen) >= C.HOLD_SECS:
-            log_i("V2: Hold complete -> resuming mission.")
+    plan_det = initial_det if initial_det.has_fire and (initial_det.label == label or initial_det.label is None) else None
+    if plan_det is None or plan_det.bbox is None:
+        plan_det = fetch_detection(max_wait_s=1.0, require_target=True)
+
+    if plan_det is None or not plan_det.has_fire or plan_det.bbox is None:
+        log_ai("Unable to confirm target for planning; aborting engagement")
+        return
+
+    distance_m = _estimate_distance_m(plan_det, spec)
+    yaw_total_deg = int(round(_pixels_to_yaw_deg(plan_det.dx)))
+    vertical_total_cm = _pixels_to_vertical_cm(plan_det.dy, distance_m)
+    strafe_total_cm = _pixels_to_strafe_cm(plan_det.dx, distance_m)
+    forward_total_cm = 0
+
+    if vertical_total_cm != 0:
+        sign = 1 if vertical_total_cm > 0 else -1
+        vertical_total_cm = sign * max(
+            C.MIN_MOVE_CM,
+            min(C.MAX_MOVE_CM, abs(vertical_total_cm)),
+        )
+
+    if strafe_total_cm != 0:
+        sign = 1 if strafe_total_cm > 0 else -1
+        strafe_total_cm = sign * max(
+            C.MIN_MOVE_CM,
+            min(C.MAX_MOVE_CM, abs(strafe_total_cm)),
+        )
+
+    if distance_m is not None:
+        delta_m = distance_m - desired_distance_m
+        if delta_m > distance_tol_m:
+            forward_total_cm = int(round(delta_m * 100.0))
+        elif delta_m < -distance_tol_m:
+            log_ai(
+                "Already within stand-off distance (distance {:.2f} m <= {:.2f} m); no forward move.".format(
+                    distance_m, desired_distance_m
+                )
+            )
+    else:
+        log_ai("Distance estimate unavailable; skipping forward advance")
+
+    instructions: List[Tuple[str, int, str, str]] = []
+    initial_yaw = get_current_yaw(t)
+
+    def enqueue_turn(total_deg: int) -> None:
+        if total_deg == 0:
+            return
+        action = "rotate_clockwise" if total_deg > 0 else "rotate_counter_clockwise"
+        undo_action = "rotate_counter_clockwise" if total_deg > 0 else "rotate_clockwise"
+        remaining = abs(total_deg)
+        min_turn = max(1, int(getattr(C, "MIN_TURN_DEG", 1)))
+        chunk = int(getattr(C, "TURN_CHUNK_DEG", 0))
+        if chunk <= 0:
+            chunk = remaining
+        chunk = max(min_turn, chunk)
+        while remaining > 0:
+            step = min(chunk, remaining)
+            instructions.append((action, step, undo_action, f"{action.replace('_', ' ')} {step} deg"))
+            remaining -= step
+
+    def enqueue_strafe(total_cm: int) -> None:
+        if total_cm == 0:
+            return
+        action = "move_right" if total_cm > 0 else "move_left"
+        undo_action = "move_left" if total_cm > 0 else "move_right"
+        remaining = abs(total_cm)
+        min_move = max(C.MIN_MOVE_CM, 1)
+        chunk = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, int(getattr(C, "APPROACH_STRAFE_CM", C.MIN_MOVE_CM))))
+        while remaining >= min_move:
+            step = min(chunk, remaining)
+            instructions.append((action, step, undo_action, f"{action.replace('_', ' ')} {step} cm"))
+            remaining -= step
+
+    def enqueue_vertical(total_cm: int) -> None:
+        if total_cm == 0:
+            return
+        action = "move_down" if total_cm > 0 else "move_up"
+        undo_action = "move_up" if total_cm > 0 else "move_down"
+        remaining = abs(total_cm)
+        min_move = max(C.MIN_MOVE_CM, 1)
+        chunk = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, int(getattr(C, "VERTICAL_STEP_CM", C.MIN_MOVE_CM))))
+        while remaining >= min_move:
+            step = min(chunk, remaining)
+            instructions.append((action, step, undo_action, f"{action.replace('_', ' ')} {step} cm"))
+            remaining -= step
+
+    def enqueue_forward(total_cm: int) -> None:
+        if total_cm <= 0:
+            return
+        remaining = total_cm
+        step_len = max(C.MIN_MOVE_CM, int(getattr(C, "FORWARD_APPROACH_STEP_CM", C.FORWARD_STEP_CM)))
+        step_len = min(step_len, C.MAX_MOVE_CM)
+        while remaining >= C.MIN_MOVE_CM:
+            step = min(step_len, remaining)
+            instructions.append(("move_forward", step, "move_back", f"move forward {step} cm"))
+            remaining -= step
+
+    if abs(strafe_total_cm) >= C.MIN_MOVE_CM:
+        yaw_total_deg = 0
+
+    if abs(yaw_total_deg) >= max(1, int(getattr(C, "MIN_TURN_DEG", 1))):
+        enqueue_turn(yaw_total_deg)
+    else:
+        yaw_total_deg = 0
+
+    if abs(strafe_total_cm) >= C.MIN_MOVE_CM:
+        enqueue_strafe(strafe_total_cm)
+    else:
+        strafe_total_cm = 0
+
+    if abs(vertical_total_cm) >= C.MIN_MOVE_CM:
+        enqueue_vertical(vertical_total_cm)
+    else:
+        vertical_total_cm = 0
+
+    if forward_total_cm > 0:
+        enqueue_forward(forward_total_cm)
+
+    log_ai(
+        "Planned path -> yaw {:+d} deg, strafe {:+d} cm, vertical {:+d} cm, forward {} cm".format(
+            yaw_total_deg, strafe_total_cm, vertical_total_cm, forward_total_cm
+        )
+    )
+
+    undo_cmds: List[Tuple[str, int]] = []
+    success = True
+
+    for action, value, undo_action, desc in instructions:
+        command = getattr(t, action, None)
+        if command is None:
+            log_w("Unknown action '{}' in plan".format(action))
+            success = False
             break
-        time.sleep(0.05)
-        current = None
+        pump_preview()
+        log_ai(desc)
+        try:
+            try_cmd(command, value, label=action)
+            undo_cmds.append((undo_action, value))
+        except Exception as exc:
+            log_ai("{} failed: {}".format(action, exc))
+            success = False
+            break
+        time.sleep(C.TURN_SLEEP if action.startswith("rotate") else C.MOVE_SLEEP)
 
+    if success:
+        post_det = fetch_detection(max_wait_s=1.0, require_target=True)
+        if post_det and post_det.has_fire and (post_det.label == label or post_det.label is None):
+            log_ai("Holding position until target lost")
+            grace_s = max(0.2, float(getattr(C, "FIRE_LOST_MS", 400)) / 1000.0)
+            max_hold = float(getattr(C, "MAX_HOLD_SECS", 0.0) or 0.0)
+            hold_start = time.time()
+            last_visible = time.time()
+            while True:
+                pump_preview()
+                time.sleep(0.2)
+                if max_hold > 0 and (time.time() - hold_start) >= max_hold:
+                    log_ai("Hold timeout reached; returning to route")
+                    break
+                check_det = fetch_detection(max_wait_s=0.2, require_target=False)
+                if check_det and check_det.has_fire and (check_det.label == label or check_det.label is None):
+                    last_visible = time.time()
+                    continue
+                if time.time() - last_visible > grace_s:
+                    log_ai("Target lost; returning to route")
+                    break
+        else:
+            log_ai("Target not visible after executing path; returning")
+    else:
+        log_ai("Planned approach could not be completed; returning")
 
-# --------------------------------------------------------------------------- #
-# Main mission flow
-# --------------------------------------------------------------------------- #
+    if undo_cmds:
+        log_ai("Returning to pre-engagement position")
+        for action, value in reversed(undo_cmds):
+            try:
+                command = getattr(t, action)
+            except AttributeError:
+                log_w("Unknown undo action '{}'".format(action))
+                continue
+            try_cmd(command, value, label=action)
+            time.sleep(C.TURN_SLEEP if action.startswith("rotate") else C.MOVE_SLEEP)
+        if initial_yaw is not None:
+            current_yaw = get_current_yaw(t)
+            if current_yaw is not None:
+                diff = _normalize_yaw(current_yaw - initial_yaw)
+                if abs(diff) >= max(1, int(getattr(C, "MIN_TURN_DEG", 1))):
+                    log_ai("Restoring heading by {:+.1f} deg".format(-diff))
+                    rotate_signed_deg(t, -diff)
 
-def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) -> int:
+def main(json_path: str, show_video: bool) -> int:
     segs, meta = load_plan(json_path)
     alt_cm = int(meta.get("height_cm", C.ALT_CM))
     speed_cm_s = int(meta.get("speed_cm_s", C.SPEED_CM_S))
-    log_i("Altitude {} cm, speed {} cm/s, AI={} policy={}".format(alt_cm, speed_cm_s, "ON" if ai_enabled else "OFF", mode_version if ai_enabled else "-"))
+    log_i("Altitude {} cm, speed {} cm/s".format(alt_cm, speed_cm_s))
 
     t = Tello()
     try:
@@ -510,26 +721,25 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
     expected_yaw = get_current_yaw(t)
     expected_yaw = _normalize_yaw(expected_yaw) if expected_yaw is not None else 0.0
 
-    need_detector = ai_enabled or show_video
     frame_supplier: Optional[Callable[[], Optional[Any]]] = None
-    frame_read = None
+    detector: Optional[FireDetector] = None
     stream_active = False
 
-    if need_detector:
-        try:
-            t.streamon()
-            stream_active = True
-            frame_read = t.get_frame_read(with_queue=False, max_queue_len=0)
+    try:
+        t.streamon()
+        stream_active = True
+        frame_read = t.get_frame_read(with_queue=False, max_queue_len=0)
 
-            def _supply_frame(fr=frame_read):
-                return fr.frame
+        def _supply_frame(fr=frame_read):
+            return fr.frame
 
-            frame_supplier = _supply_frame
-        except Exception as exc:
-            log_w("streamon error - disabling AI/show-video: {}".format(exc))
-            need_detector = False
-            ai_enabled = False
-            show_video = False
+        frame_supplier = _supply_frame
+        detector = FireDetector(enable_model=True, show_video=show_video)
+        detector.start_async(frame_supplier)
+    except Exception as exc:
+        log_w("streamon error - disabling detection/preview: {}".format(exc))
+        frame_supplier = None
+        detector = None
 
     try:
         t.set_speed(speed_cm_s)
@@ -553,12 +763,12 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
     if climb > 0:
         climb_step = max(0, getattr(C, "CLIMB_CHUNK_CM", 0))
         remaining = climb
-        chunk_idx = 0
+        idx = 0
         while remaining > 0:
             step = remaining if climb_step <= 0 else min(remaining, climb_step)
-            chunk_idx += 1
+            idx += 1
             if climb_step > 0 and remaining > step:
-                log_i("    climb chunk {}: {} cm (rem {})".format(chunk_idx, step, remaining - step))
+                log_i("    climb chunk {}: {} cm (rem {})".format(idx, step, remaining - step))
             try:
                 try_cmd(t.move_up, step, label="move_up")
             except Exception as exc:
@@ -566,16 +776,6 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
                 break
             remaining -= step
             time.sleep(C.MOVE_SLEEP)
-
-    detector: Optional[FireDetector] = None
-    if need_detector and frame_supplier is not None:
-        detector = FireDetector(enable_model=ai_enabled, show_video=show_video)
-        detector.start_async(frame_supplier)
-    elif need_detector:
-        log_w("Stream active but frame source unavailable; live preview disabled.")
-        show_video = False
-        ai_enabled = False
-        detector = None
 
     aborted = False
     try:
@@ -593,9 +793,9 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
                 log_i("[{}] turn {:+d} deg".format(idx, turn_deg))
                 rotate_signed_deg(t, turn_deg)
                 expected_yaw = _normalize_yaw(expected_yaw + turn_deg)
-                yaw_after_turn = get_current_yaw(t)
-                if yaw_after_turn is not None:
-                    expected_yaw = _normalize_yaw(yaw_after_turn)
+                yaw_after = get_current_yaw(t)
+                if yaw_after is not None:
+                    expected_yaw = _normalize_yaw(yaw_after)
 
             remaining = int(round(dist_cm))
             log_i("[{}] forward total {} cm".format(idx, remaining))
@@ -610,20 +810,18 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
                 time.sleep(C.MOVE_SLEEP)
                 expected_yaw = correct_heading_if_needed(t, expected_yaw)
 
-                if detector and ai_enabled:
-                    det_snapshot = detector.get_latest_detection(max_age=0.7)
+                if detector:
+                    det_snapshot = detector.get_latest_detection(max_age=0.3)
                     if det_snapshot and det_snapshot.has_fire:
-                        detector.pause_async()
-                        try:
-                            if mode_version == 1:
-                                do_policy_v1_hold_until_lost(t, detector, frame_supplier, det_snapshot)
-                            elif mode_version == 2:
-                                do_policy_v2_approach_then_hold(t, detector, frame_supplier, det_snapshot)
-                        finally:
-                            detector.resume_async()
-                        yaw_after_policy = get_current_yaw(t)
-                        if yaw_after_policy is not None:
-                            expected_yaw = _normalize_yaw(yaw_after_policy)
+                        label_detected = (det_snapshot.label or "fire").lower()
+                        if label_detected not in C.TARGET_SPECS and "fire" not in C.TARGET_SPECS:
+                            continue
+                        log_i("Target '{}' detected; engaging".format(label_detected))
+                        log_ai("Detected '{}' conf={:.2f}".format(label_detected, det_snapshot.conf))
+                        engage_target(t, detector, frame_supplier, det_snapshot)
+                        yaw_after = get_current_yaw(t)
+                        if yaw_after is not None:
+                            expected_yaw = _normalize_yaw(yaw_after)
 
             if C.PAUSE_PER_SEG > 0:
                 time.sleep(C.PAUSE_PER_SEG)
@@ -648,15 +846,11 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
     return 0
 
 
-# --------------------------------------------------------------------------- #
-# CLI entrypoint
-# --------------------------------------------------------------------------- #
-
 def _resolve_plan_path(args) -> Path:
     if args.use_last or args.json_path is None:
         last = find_latest_beta_waypoint_json()
         if last:
-            print("[*] Using latest plan: {}".format(last))
+            print(f"[*] Using latest plan: {last}")
             return last
         print("[X] No beta_waypoint*.json found in plans/ and no path provided.")
         raise SystemExit(2)
@@ -664,30 +858,18 @@ def _resolve_plan_path(args) -> Path:
     if not candidate.is_absolute():
         candidate = PLAN_DIR / candidate
     if not candidate.exists():
-        print("[X] JSON not found: {}".format(candidate))
+        print(f"[X] JSON not found: {candidate}")
         raise SystemExit(2)
     return candidate
 
 
 def cli() -> int:
-    parser = argparse.ArgumentParser(description="Fly Tello plan with optional fire detection")
+    parser = argparse.ArgumentParser(description="Fly plan with target engagement")
     parser.add_argument(
         "json_path",
         nargs="?",
         default=None,
         help="Path to beta_waypoint JSON (relative names are looked up in plans/).",
-    )
-    parser.add_argument(
-        "--mode",
-        choices=["1", "2"],
-        default=None,
-        help="AI policy: 1=resume when lost, 2=approach+hold. Ignored if AI is off.",
-    )
-    parser.add_argument(
-        "--ai",
-        choices=["auto", "on", "off"],
-        default="auto",
-        help="Force AI on/off, or use config (default: auto).",
     )
     parser.add_argument(
         "--log",
@@ -703,7 +885,7 @@ def cli() -> int:
     parser.add_argument(
         "--show-video",
         action="store_true",
-        help="Force live preview window even if AI is off.",
+        help="Show live preview window.",
     )
 
     args = parser.parse_args()
@@ -711,20 +893,11 @@ def cli() -> int:
 
     log_path = args.log_path
     if log_path == "":
-        log_path = "logs/flight_{}.log".format(datetime.now().strftime("%Y%m%d_%H%M%S"))
+        os.makedirs("logs", exist_ok=True)
+        log_path = os.path.join("logs", f"flight_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
     init_logging(log_path)
 
-    if args.ai == "auto":
-        ai_enabled = bool(C.ENABLE_AI)
-    else:
-        ai_enabled = args.ai == "on"
-
-    policy = int(C.VERSION)
-    if args.mode is not None:
-        policy = int(args.mode)
-    policy_internal = policy if ai_enabled else 0
-
-    return main(str(plan_path), policy_internal, ai_enabled, args.show_video)
+    return main(str(plan_path), args.show_video)
 
 
 if __name__ == "__main__":

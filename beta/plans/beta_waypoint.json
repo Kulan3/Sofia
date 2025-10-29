@@ -1,28 +1,22 @@
 {
     "wp": [
         {
-            "dist_cm": 99,
-            "dist_px": 33,
+            "dist_cm": 156,
+            "dist_px": 52,
             "angle_deg": 0,
             "turn_signed_deg": 0
         },
         {
-            "dist_cm": 76,
-            "dist_px": 25,
-            "angle_deg": 81,
-            "turn_signed_deg": -81
+            "dist_cm": 36,
+            "dist_px": 12,
+            "angle_deg": 176,
+            "turn_signed_deg": 176
         },
         {
-            "dist_cm": 93,
-            "dist_px": 31,
-            "angle_deg": 95,
-            "turn_signed_deg": -95
-        },
-        {
-            "dist_cm": 69,
-            "dist_px": 23,
-            "angle_deg": 89,
-            "turn_signed_deg": -89
+            "dist_cm": 192,
+            "dist_px": 64,
+            "angle_deg": 3,
+            "turn_signed_deg": 3
         }
     ],
     "pos": [
@@ -31,16 +25,12 @@
             360
         ],
         [
-            347,
-            361
-        ],
-        [
-            350,
-            336
-        ],
-        [
             381,
-            337
+            412
+        ],
+        [
+            382,
+            424
         ],
         [
             380,

@@ -29,6 +29,7 @@ class FireDetection:
         conf: float = 0.0,
         bbox: Optional[Tuple[int, int, int, int]] = None,
         timestamp: Optional[float] = None,
+        label: Optional[str] = None,
     ) -> None:
         self.has_fire = bool(has_fire)
         self.dx = float(dx)
@@ -37,6 +38,7 @@ class FireDetection:
         self.conf = float(conf)
         self.bbox = bbox
         self.ts = float(time.time() if timestamp is None else timestamp)
+        self.label = label
 
 
 class FireDetector:
@@ -58,7 +60,7 @@ class FireDetector:
                 raise FileNotFoundError("YOLO model not found at {}".format(model_path))
             self.model = YOLO(str(model_path), task="detect")
 
-        self.classes = set(C.DETECT_CLASSES) if C.DETECT_CLASSES else None
+        self.classes = {str(label).lower() for label in C.DETECT_CLASSES} if C.DETECT_CLASSES else None
         self.last_seen_ts = 0.0
 
         self._video_writer = None
@@ -112,9 +114,10 @@ class FireDetector:
             self._update_last(detection)
             return detection
 
-        frame_bgr = frame
         if self._expect_rgb:
             frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        else:
+            frame_bgr = frame.copy()
 
         annotated_bgr = frame_bgr
         detection = FireDetection(False)
@@ -136,12 +139,13 @@ class FireDetector:
             for box in boxes:
                 cls_id = int(box.cls[0]) if box.cls is not None else -1
                 name = self.model.names.get(cls_id, str(cls_id))
-                if self.classes and name not in self.classes:
+                name_norm = str(name).lower()
+                if self.classes and name_norm not in self.classes:
                     continue
                 conf = float(box.conf[0]) if box.conf is not None else 0.0
                 coords = box.xyxy[0].tolist()
                 if best is None or conf > best[2]:
-                    best = (coords, name, conf)
+                    best = (coords, name_norm, conf)
 
         if best is not None:
             x1, y1, x2, y2 = best[0]
@@ -158,6 +162,7 @@ class FireDetector:
                 area_frac=area_frac,
                 conf=best[2],
                 bbox=(int(x1), int(y1), int(x2), int(y2)),
+                label=best[1],
             )
             self.last_seen_ts = time.time()
 

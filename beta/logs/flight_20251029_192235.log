@@ -1,0 +1,80 @@
+2025-10-29 19:22:35,490 INFO Logging to logs\flight_20251029_192235.log
+2025-10-29 19:22:35,491 INFO Altitude 90 cm, speed 30 cm/s
+2025-10-29 19:22:35,492 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 19:22:35,492 INFO Connecting (attempt 1/4)...
+2025-10-29 19:22:35,494 INFO Send command: 'command'
+2025-10-29 19:22:35,595 INFO Response command: 'ok'
+2025-10-29 19:22:35,646 INFO Battery 98%
+2025-10-29 19:22:35,698 INFO Send command: 'streamon'
+2025-10-29 19:22:35,798 INFO Response streamon: 'ok'
+2025-10-29 19:22:38,028 INFO Send command: 'speed 30'
+2025-10-29 19:22:38,131 INFO Response speed 30: 'ok'
+2025-10-29 19:22:38,132 INFO Takeoff.
+2025-10-29 19:22:38,133 INFO Send command: 'takeoff'
+2025-10-29 19:22:42,647 INFO Response takeoff: 'ok'
+2025-10-29 19:22:43,148 INFO Hovering for IMU stabilization (2.0s).
+2025-10-29 19:22:45,149 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-29 19:22:45,149 INFO Send command: 'up 40'
+2025-10-29 19:22:47,759 INFO Response up 40: 'ok'
+2025-10-29 19:22:47,959 INFO Send command: 'up 30'
+2025-10-29 19:22:50,167 INFO Response up 30: 'ok'
+2025-10-29 19:22:50,368 INFO [0] turn +89 deg
+2025-10-29 19:22:50,368 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-29 19:22:50,569 INFO     turn chunk 1: CCW 45 deg (rem 44)
+2025-10-29 19:22:50,569 INFO Send command: 'ccw 45'
+2025-10-29 19:22:52,577 INFO Response ccw 45: 'ok'
+2025-10-29 19:22:52,778 INFO Send command: 'ccw 44'
+2025-10-29 19:22:54,183 INFO Response ccw 44: 'ok'
+2025-10-29 19:22:54,384 INFO [0] forward total 156 cm
+2025-10-29 19:22:54,384 INFO Send command: 'forward 60'
+2025-10-29 19:22:57,694 INFO Response forward 60: 'ok'
+2025-10-29 19:22:57,895 INFO Send command: 'forward 60'
+2025-10-29 19:23:01,106 INFO Response forward 60: 'ok'
+2025-10-29 19:23:01,308 INFO Send command: 'forward 36'
+2025-10-29 19:23:03,215 INFO Response forward 36: 'ok'
+2025-10-29 19:23:03,416 INFO Target 'bottle' detected; engaging
+2025-10-29 19:23:03,651 INFO Send command: 'left 20'
+2025-10-29 19:23:06,563 INFO Response left 20: 'ok'
+2025-10-29 19:23:06,867 INFO Send command: 'down 20'
+2025-10-29 19:23:06,867 INFO Response down 20: 'ok'
+2025-10-29 19:23:07,165 INFO Send command: 'forward 30'
+2025-10-29 19:23:08,470 INFO Response forward 30: 'ok'
+2025-10-29 19:23:09,676 INFO Send command: 'back 30'
+2025-10-29 19:23:09,676 INFO Response back 30: 'ok'
+2025-10-29 19:23:09,877 INFO Send command: 'up 20'
+2025-10-29 19:23:11,785 INFO Response up 20: 'ok'
+2025-10-29 19:23:11,987 INFO Send command: 'right 20'
+2025-10-29 19:23:13,595 INFO Response right 20: 'ok'
+2025-10-29 19:23:13,797 INFO [1] turn +176 deg
+2025-10-29 19:23:13,797 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-29 19:23:13,998 INFO     turn chunk 1: CCW 45 deg (rem 131)
+2025-10-29 19:23:13,998 INFO Send command: 'ccw 45'
+2025-10-29 19:23:15,503 INFO Response ccw 45: 'ok'
+2025-10-29 19:23:15,704 INFO     turn chunk 2: CCW 45 deg (rem 86)
+2025-10-29 19:23:15,705 INFO Send command: 'ccw 45'
+2025-10-29 19:23:17,112 INFO Response ccw 45: 'ok'
+2025-10-29 19:23:17,312 INFO     turn chunk 3: CCW 45 deg (rem 41)
+2025-10-29 19:23:17,313 INFO Send command: 'ccw 45'
+2025-10-29 19:23:18,617 INFO Response ccw 45: 'ok'
+2025-10-29 19:23:18,818 INFO Send command: 'ccw 41'
+2025-10-29 19:23:20,122 INFO Response ccw 41: 'ok'
+2025-10-29 19:23:20,323 INFO [1] forward total 36 cm
+2025-10-29 19:23:20,323 INFO Send command: 'forward 36'
+2025-10-29 19:23:22,933 INFO Response forward 36: 'ok'
+2025-10-29 19:23:23,134 INFO [2] turn +3 deg
+2025-10-29 19:23:23,134 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-29 19:23:23,335 INFO Send command: 'ccw 3'
+2025-10-29 19:23:23,937 INFO Response ccw 3: 'ok'
+2025-10-29 19:23:24,138 INFO [2] forward total 192 cm
+2025-10-29 19:23:24,140 INFO Send command: 'forward 60'
+2025-10-29 19:23:27,252 INFO Response forward 60: 'ok'
+2025-10-29 19:23:27,452 INFO Send command: 'forward 60'
+2025-10-29 19:23:30,764 INFO Response forward 60: 'ok'
+2025-10-29 19:23:30,965 INFO Send command: 'forward 60'
+2025-10-29 19:23:34,378 INFO Response forward 60: 'ok'
+2025-10-29 19:23:34,579 INFO Mission complete. Landing.
+2025-10-29 19:23:34,580 INFO Send command: 'land'
+2025-10-29 19:23:36,990 INFO Response land: 'ok'
+2025-10-29 19:23:37,101 INFO Send command: 'streamoff'
+2025-10-29 19:23:37,202 INFO Response streamoff: 'ok'
+2025-10-29 19:23:37,203 INFO Done.
