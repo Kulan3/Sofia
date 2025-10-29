@@ -169,10 +169,7 @@ class FireDetector:
             except Exception:
                 annotated_bgr = frame_bgr
 
-        display_bgr = annotated_bgr
-        if self._expect_rgb:
-            display_bgr = cv2.cvtColor(annotated_bgr, cv2.COLOR_RGB2BGR)
-        self._display_frame(display_bgr)
+        self._display_frame(annotated_bgr)
         self._update_last(detection)
         return detection
 

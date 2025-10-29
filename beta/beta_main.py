@@ -9,7 +9,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from djitellopy import Tello
 
@@ -511,7 +511,7 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
     expected_yaw = _normalize_yaw(expected_yaw) if expected_yaw is not None else 0.0
 
     need_detector = ai_enabled or show_video
-    frame_supplier: Optional[Callable[[], Optional[object]]] = None
+    frame_supplier: Optional[Callable[[], Optional[Any]]] = None
     frame_read = None
     stream_active = False
 
@@ -570,8 +570,7 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
     detector: Optional[FireDetector] = None
     if need_detector and frame_supplier is not None:
         detector = FireDetector(enable_model=ai_enabled, show_video=show_video)
-        if ai_enabled:
-            detector.start_async(frame_supplier)
+        detector.start_async(frame_supplier)
     elif need_detector:
         log_w("Stream active but frame source unavailable; live preview disabled.")
         show_video = False
@@ -611,25 +610,20 @@ def main(json_path: str, mode_version: int, ai_enabled: bool, show_video: bool) 
                 time.sleep(C.MOVE_SLEEP)
                 expected_yaw = correct_heading_if_needed(t, expected_yaw)
 
-                if detector:
-                    if ai_enabled:
-                        det_snapshot = detector.get_latest_detection(max_age=0.7)
-                        if det_snapshot and det_snapshot.has_fire:
-                            detector.pause_async()
-                            try:
-                                if mode_version == 1:
-                                    do_policy_v1_hold_until_lost(t, detector, frame_supplier, det_snapshot)
-                                elif mode_version == 2:
-                                    do_policy_v2_approach_then_hold(t, detector, frame_supplier, det_snapshot)
-                            finally:
-                                detector.resume_async()
-                            yaw_after_policy = get_current_yaw(t)
-                            if yaw_after_policy is not None:
-                                expected_yaw = _normalize_yaw(yaw_after_policy)
-                    elif show_video and frame_supplier is not None:
-                        frame = frame_supplier()
-                        if frame is not None:
-                            detector.infer(frame)
+                if detector and ai_enabled:
+                    det_snapshot = detector.get_latest_detection(max_age=0.7)
+                    if det_snapshot and det_snapshot.has_fire:
+                        detector.pause_async()
+                        try:
+                            if mode_version == 1:
+                                do_policy_v1_hold_until_lost(t, detector, frame_supplier, det_snapshot)
+                            elif mode_version == 2:
+                                do_policy_v2_approach_then_hold(t, detector, frame_supplier, det_snapshot)
+                        finally:
+                            detector.resume_async()
+                        yaw_after_policy = get_current_yaw(t)
+                        if yaw_after_policy is not None:
+                            expected_yaw = _normalize_yaw(yaw_after_policy)
 
             if C.PAUSE_PER_SEG > 0:
                 time.sleep(C.PAUSE_PER_SEG)

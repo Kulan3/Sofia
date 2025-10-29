@@ -97,7 +97,7 @@ HOLD_SECS          = 6.0     # dwell time near fire (policy 2)
 VIDEO_SAVE_PATH    = None    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
 VIDEO_FPS          = 40
 VIDEO_CODEC        = "mp4v"
-TELLO_FRAME_RGB    = True    # djitellopy returns RGB frames by default
+TELLO_FRAME_RGB    = False   # djitellopy delivers BGR frames; set True only if you convert to RGB elsewhere
 ASYNC_FRAME_HZ     = 12      # background frame polling rate when stream is on
 
 # Drift mitigation
