@@ -1,0 +1,15 @@
+jetson note
+cv2.imshow needs three things that can silently be missing on Jetson even if a monitor is plugged in:
+
+A GUI-capable OpenCV build: if you installed opencv-python-headless, imshow is disabled. Check with python3 -c "import cv2; print(cv2.getBuildInformation())" and look for “GUI: YES” plus a backend (GTK, Qt, GTK3). If it says NO, reinstall from JetPack’s repo (sudo apt install python3-opencv) or build OpenCV with GUI support, then remove the headless wheel.
+
+DISPLAY permissions: when you start the mission from a TTY or sudo shell, the process might not be allowed to draw on the desktop (DISPLAY unset or access denied). Before running:
+
+export DISPLAY=:0
+xhost +LOCAL:
+If you need sudo, keep the environment (sudo -E python3 beta_main.py ...) or run as the normal user inside a terminal on the desktop.
+
+An actual window created: the code already uses cv2.imshow. You can force the backend to create one by inserting (once) cv2.namedWindow("Tello Live", cv2.WINDOW_NORMAL) after the detector is created, but that will only succeed if the two points above are satisfied.
+
+Follow that order—first confirm your OpenCV build supports GUI, then ensure DISPLAY/xhost (especially if you launch from ssh or via sudo). Once those are in place the Tello Live window should appear on the Xavier’s monitor.
+
