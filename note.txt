@@ -72,3 +72,21 @@ sudo iptables -A OUTPUT -p udp -d 192.168.10.1 --dport 11111 -j ACCEPT
 sudo apt install -y iptables-persistent
 sudo netfilter-persistent save
 
+or
+
+
+sudo ufw enable
+
+# allow inbound STATE (8890/udp)
+sudo ufw allow in proto udp to any port 8890
+
+# (optional) allow inbound command replies (8889/udp) and video (11111/udp)
+sudo ufw allow in proto udp to any port 8889
+sudo ufw allow in proto udp to any port 11111
+
+# (optional) tie to your Wi-Fi iface (replace wlan0 if different)
+sudo ufw allow in on wlan0 proto udp to any port 8890
+sudo ufw allow in on wlan0 proto udp to any port 8889
+sudo ufw allow in on wlan0 proto udp to any port 11111
+
+sudo ufw status numbered
