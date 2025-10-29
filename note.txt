@@ -90,3 +90,8 @@ sudo ufw allow in on wlan0 proto udp to any port 8889
 sudo ufw allow in on wlan0 proto udp to any port 11111
 
 sudo ufw status numbered
+
+
+
+
+(tello drone connection port is 8890, camera port is 11111)
