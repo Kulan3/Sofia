@@ -1,22 +1,16 @@
 {
     "wp": [
         {
-            "dist_cm": 156,
-            "dist_px": 52,
+            "dist_cm": 150,
+            "dist_px": 50,
             "angle_deg": 0,
             "turn_signed_deg": 0
         },
         {
-            "dist_cm": 36,
-            "dist_px": 12,
-            "angle_deg": 176,
-            "turn_signed_deg": 176
-        },
-        {
-            "dist_cm": 192,
-            "dist_px": 64,
-            "angle_deg": 3,
-            "turn_signed_deg": 3
+            "dist_cm": 150,
+            "dist_px": 50,
+            "angle_deg": 0,
+            "turn_signed_deg": 0
         }
     ],
     "pos": [
@@ -25,12 +19,8 @@
             360
         ],
         [
-            381,
-            412
-        ],
-        [
-            382,
-            424
+            430,
+            360
         ],
         [
             380,
