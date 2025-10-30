@@ -92,8 +92,7 @@ APPROACH_DISTANCE_TOL_CM = 5   # acceptable +/- distance band
 APPROACH_TIMEOUT_S       = 30  # give up approaching after this many seconds
 
 # Optional recording (set path or None)
-VIDEO_SAVE_PATH    = None    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
-VIDEO_FPS          = 60
+VIDEO_SAVE_PATH    = "C:/Users/nutth/Desktop/Sofia/Video/test.mp4"
 VIDEO_CODEC        = "mp4v"
 TELLO_FRAME_RGB    = True   # djitellopy delivers BGR frames; set True only if frames are already RGB
 ASYNC_FRAME_HZ     = 12      # background frame polling rate when stream is on
