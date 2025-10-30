@@ -1,0 +1,12 @@
+2025-10-29 13:44:16,534 INFO Logging to logs/flight_20251029_134416.log
+2025-10-29 13:44:16,535 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-29 13:44:16,536 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 13:44:16,536 INFO Connecting (attempt 1/4)...
+2025-10-29 13:44:16,539 INFO Send command: 'command'
+2025-10-29 13:44:16,640 INFO Response command: 'ok'
+2025-10-29 13:44:16,642 INFO Battery 26%
+2025-10-29 13:44:16,645 INFO Send command: 'streamon'
+2025-10-29 13:44:16,746 INFO Response streamon: 'ok'
+2025-10-29 13:44:21,778 WARNING streamon error - disabling AI/show-video: Failed to grab video frames from video stream
+2025-10-29 13:44:21,779 INFO Send command: 'speed 30'
+2025-10-29 13:44:27,132 INFO Send command: 'streamoff'

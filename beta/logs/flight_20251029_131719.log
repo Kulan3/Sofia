@@ -1,0 +1,20 @@
+2025-10-29 13:17:19,995 INFO Logging to logs/flight_20251029_131719.log
+2025-10-29 13:17:19,996 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-29 13:17:19,998 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 13:17:19,998 INFO Connecting (attempt 1/4)...
+2025-10-29 13:17:20,001 INFO Send command: 'command'
+2025-10-29 13:17:20,102 INFO Response command: 'ok'
+2025-10-29 13:17:21,118 WARNING connect error: Did not receive a state packet from the Tello
+2025-10-29 13:17:22,121 INFO Connecting (attempt 2/4)...
+2025-10-29 13:17:22,123 INFO Send command: 'command'
+2025-10-29 13:17:22,224 INFO Response command: 'ok'
+2025-10-29 13:17:23,237 WARNING connect error: Did not receive a state packet from the Tello
+2025-10-29 13:17:24,240 INFO Connecting (attempt 3/4)...
+2025-10-29 13:17:24,242 INFO Send command: 'command'
+2025-10-29 13:17:24,343 INFO Response command: 'ok'
+2025-10-29 13:17:25,357 WARNING connect error: Did not receive a state packet from the Tello
+2025-10-29 13:17:26,359 INFO Connecting (attempt 4/4)...
+2025-10-29 13:17:26,361 INFO Send command: 'command'
+2025-10-29 13:17:26,462 INFO Response command: 'ok'
+2025-10-29 13:17:27,474 WARNING connect error: Did not receive a state packet from the Tello
+2025-10-29 13:17:28,477 ERROR Unable to connect. Check TELLO Wi-Fi / power / close other Tello apps.

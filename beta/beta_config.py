@@ -4,9 +4,9 @@ from pathlib import Path
 # Mission & Drone Defaults
 # =========================
 
-# Flight
-ALT_CM             = 90      # target altitude above takeoff (cm)
-SPEED_CM_S         = 30      # 10-50 safe indoors
+# Basic Flight
+ALT_CM             = 60      # target height from takeoff (cm)
+SPEED_CM_S         = 60      # 10-50 (indoors)
 LOW_BATT_RTH       = 20      # % battery threshold (abort at/under this)
 
 # Waypoint execution
@@ -56,9 +56,9 @@ ENABLE_AI          = True
 
 # Model
 _MODEL_DIR         = Path(__file__).resolve().parent
-YOLO_MODEL_PATH    = str((_MODEL_DIR / "yolov8n.pt").resolve())  # change to your weights if needed
-DETECT_CLASSES     = 'backpack'              # None = any class; or ['fire','smoke']
-DETECT_CONF        = 0.45              # confidence threshold (0..1)
+YOLO_MODEL_PATH    = str((_MODEL_DIR / "bp.pt").resolve())  # change to your weights if needed
+DETECT_CLASSES     = ['bottle']              # None = any class; or ['fire','smoke']
+DETECT_CONF        = 0.20              # confidence threshold (0..1)
 
 # Video / geometry
 FRAME_W            = 960
@@ -71,35 +71,40 @@ V_FOV_DEG          = 52.0
 SHOW_VIDEO         = True              # show an OpenCV window with stream/overlay
 
 # Debounce / decision
-FIRE_PERSIST_MS    = 300               # require detection persist this long to count as 'real'
-FIRE_LOST_MS       = 600               # consider 'lost' after no detection for this long
+FIRE_PERSIST_MS    = 200               # require detection persist this long to count as 'real'
+FIRE_LOST_MS       = 400               # consider 'lost' after no detection for this long
 
 # =========================
 # Fire Handling Behavior
 # =========================
-# VERSION = 1 -> approach while fire present, continue when lost
-# VERSION = 2 -> approach fire, hold nearby for HOLD_SECS, then continue
-VERSION                   = 2
-
-# After AI episode, restore heading so path stays true to plan
-RESTORE_HEADING_AFTER_AI  = True
-
 # Approach parameters (used by both policies)
-CENTER_TOL_PX      = 50      # |dx| <= this means centered (pixels)
+CENTER_TOL_PX      = 40      # |dx| <= this means centered (pixels)
+VERTICAL_TOL_PX    = 40      # |dy| <= this means centered vertically (pixels)
 NEAR_AREA_FRAC     = 0.25    # bbox area fraction considered 'near enough'
 APPROACH_YAW_STEP  = 10      # deg per yaw correction
-APPROACH_STRAFE_CM = 25      # cm per lateral (not used by default, kept for expansion)
-APPROACH_FWD_CM    = 40      # cm per forward step
-APPROACH_MAX_STEPS = 15      # failsafe: avoid infinite approach in policy 2
-HOLD_SECS          = 6.0     # dwell time near fire (policy 2)
+APPROACH_STRAFE_CM = 25      # reserved for future lateral moves
+APPROACH_FWD_CM    = 40      # cm per forward step (legacy)
+APPROACH_MAX_STEPS = 15      # failsafe loop limit for old policies
+HOLD_SECS          = 6.0     # dwell time when aligned on target
+VERTICAL_STEP_CM   = 20      # cm per vertical correction during approach
+FORWARD_APPROACH_STEP_CM = 30  # cm per forward move while closing distance
+APPROACH_DISTANCE_TOL_CM = 5   # acceptable +/- distance band
+APPROACH_TIMEOUT_S       = 30  # give up approaching after this many seconds
 
 # Optional recording (set path or None)
-VIDEO_SAVE_PATH    = None    # e.g. r"C:\Users\nutth\Videos\Drone\Fly_Test.mp4" or None
-VIDEO_FPS          = 40
+VIDEO_SAVE_PATH    = "C:/Users/nutth/Desktop/Sofia/Video/test.mp4"
 VIDEO_CODEC        = "mp4v"
-TELLO_FRAME_RGB    = True    # djitellopy returns RGB frames by default
+TELLO_FRAME_RGB    = True   # djitellopy delivers BGR frames; set True only if frames are already RGB
 ASYNC_FRAME_HZ     = 12      # background frame polling rate when stream is on
 
 # Drift mitigation
 DRIFT_HEADING_TOL_DEG = 5    # correct heading if |actual-expected| exceeds this
 DRIFT_CORRECT_MAX_DEG = 10   # clamp correction magnitude per adjustment
+
+# Target specifications: real width (meters) and desired standoff distance (meters)
+TARGET_SPECS = {
+    "bottle": {
+        "real_width_m": 0.046,
+        "approach_distance_m": 0.30,
+    }
+}

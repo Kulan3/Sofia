@@ -1,0 +1,26 @@
+2025-10-29 18:40:15,473 INFO Logging to logs\flight_20251029_184015.log
+2025-10-29 18:40:15,474 INFO Altitude 90 cm, speed 30 cm/s
+2025-10-29 18:40:15,475 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 18:40:15,475 INFO Connecting (attempt 1/4)...
+2025-10-29 18:40:15,478 INFO Send command: 'command'
+2025-10-29 18:40:15,579 INFO Response command: 'ok'
+2025-10-29 18:40:15,580 INFO Battery 26%
+2025-10-29 18:40:15,583 INFO Send command: 'streamon'
+2025-10-29 18:40:15,684 INFO Response streamon: 'ok'
+2025-10-29 18:40:17,935 INFO Send command: 'speed 30'
+2025-10-29 18:40:18,040 INFO Response speed 30: 'ok'
+2025-10-29 18:40:18,041 INFO Takeoff.
+2025-10-29 18:40:18,043 INFO Send command: 'takeoff'
+2025-10-29 18:40:26,880 INFO Response takeoff: 'ok'
+2025-10-29 18:40:27,381 INFO Hovering for IMU stabilization (2.0s).
+2025-10-29 18:40:29,382 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-29 18:40:29,382 INFO Send command: 'up 40'
+2025-10-29 18:40:31,592 INFO Response up 40: 'ok'
+2025-10-29 18:40:31,793 INFO Send command: 'up 30'
+2025-10-29 18:40:31,793 INFO Response up 30: 'ok'
+2025-10-29 18:40:31,994 ERROR Low battery 18% - stop mission
+2025-10-29 18:40:31,994 INFO Send command: 'land'
+2025-10-29 18:40:31,995 INFO Response land: 'ok'
+2025-10-29 18:40:32,011 INFO Send command: 'streamoff'
+2025-10-29 18:40:32,011 INFO Response streamoff: 'ok'
+2025-10-29 18:40:32,012 INFO Done.

@@ -1,169 +1,100 @@
+Beta Flight Stack Quickstart
+============================
 
-Key scripts
------------
-- `beta_main.py`            Mission runner (waypoints, AI policies, safety fallbacks)
-- `beta_detect.py`          YOLO fire detector + video overlay
-- `beta_path_gui.py`        Planner UI (writes `plans/beta_waypoint*.json`)
-- `dry_main.py`             Offline dry-run of a plan (no hardware)
-- `runner.py`               Convenience launcher for common profiles
-- `beta_config.py`          All tunables (altitude, retries, timeout pads, AI switches)
-
-Planning a route
+Directory layout
 ----------------
+- `beta_main.py` – mission runner (waypoints, target engagement, safety fallbacks)
+- `beta_detect.py` – YOLO detector + optional live preview/recording
+- `beta_path_gui.py` – waypoint editor (writes files to `plans/`)
+- `dry_main.py` – dry-run tool that prints the command sequence (no hardware)
+- `beta_config.py` – tunables for speed/altitude, retries, timeouts, target specs
+- `runner.py` – convenience launcher for common scenarios
+- `plans/` – stored waypoint JSONs (created by the planner)
+- `logs/` – command logs (`flight_*.log`) and AI engagement logs (`flight_ai_*.log`)
+
+Planning routes
+---------------
 ```
 python beta_path_gui.py
 ```
-- Free mode: click to drop points, `Z` undo, `Y` redo, `H` return to start.
-- Grid mode: press **Gen Grid**, set width/height/cell, toggle sweep with **Grid Dir**.
-- **Save JSON** writes `plans/beta_waypoint.json` (enter a new filename to branch plans).
+- Free mode: click to add points, `Z` undo, `Y` redo, `H` return to origin.
+- Grid mode: choose size/cell spacing via **Gen Grid**, swap sweep direction with **Grid Dir**.
+- **Save JSON** to export into `plans/beta_waypoint.json` (type a new filename to branch plans).
 
-Flying missions
----------------
+Running missions
+----------------
 ```
-python beta_main.py --use-last                    # newest plan, AI flag from config
-python beta_main.py --use-last --ai off           # pure waypoint execution
-python beta_main.py --use-last --ai on --mode 1   # AI policy 1 (approach then resume)
-python beta_main.py --use-last --ai on --mode 2   # AI policy 2 (approach then dwell)
-python beta_main.py plans/custom.json             # explicit plan file
+python beta_main.py --use-last                      # newest plan with engagement + preview
+python beta_main.py --use-last --show-video         # force preview window
+python beta_main.py plans/custom.json               # explicit plan file
 ```
 Useful flags:
-- `--show-video` opens the live preview window (works even with `--ai off`)
-- `--log ""` auto-creates `logs/flight_YYYYMMDD_HHMMSS.log`
-- `--log logs/test.log` writes to a fixed path
+- `--show-video` – keep the preview window open.
+- `--log ""` – auto-generate a timestamped log in `logs/`.
+- `--log logs/test.log` – write to a fixed log path.
 
-Live preview without AI
------------------------
+Preview-only
+------------
 ```
-python beta_main.py --use-last --ai off --show-video --log ""
+python beta_detect.py
 ```
-Frames are still annotated, but the AI policies stay dormant.
+Displays the YOLO overlay without flying. Close with `x`.
 
-Safety/timeouts overview
-------------------------
-- `beta_config.py` exposes `RESPONSE_TIMEOUT_S`, `COMMAND_RETRY_COUNT`, and the
-  distance-aware `COMMAND_TIMEOUT_PAD`. Longer moves automatically get extra grace time.
-- After a timeout the script inspects telemetry (height, etc.). If the move already finished,
-  retries are skipped.
-- `Ctrl+C` always funnels into `safe_land()`, which attempts SDK landing then RC descent.
+Dry run (no drone)
+------------------
+```
+python dry_main.py --use-last
+python dry_main.py plans/beta_waypoint.json
+```
+Prints the command sequence, move counts, and time estimates for inspection.
 
-Using the helper launcher
--------------------------
+Helper launcher
+---------------
 ```
 python runner.py --help
 ```
-Profiles include dry-run, preview-only, AI policies, and a diagnostic mode that logs sensor
-state every loop.
+Profiles include:
+- `mission` – latest plan, preview + auto logs
+- `silent` – latest plan, no preview
+- `preview` – latest plan, preview only
+- `detect` – run `beta_detect.py`
+- `dry` – invoke the dry-run tool
+Append extra CLI flags after `--` (e.g. `python runner.py mission -- --log logs/foo.log`).
 
-Recommended first-flight flow
------------------------------
-1. **Plan** the route â€“ `python beta_path_gui.py`, save to `plans/`.
-2. **Dry run** the JSON â€“ `python dry_main.py --use-last`.
-3. **Hover test** indoors â€“ `python beta_main.py --use-last --ai off --show-video --log ""`.
-4. **Enable AI** once the link is stable â€“ `python beta_main.py --use-last --ai on --mode 1`.
-
-Troubleshooting check list
---------------------------
-- If `streamon` fails, the script logs a warning and keeps flying without AI/preview.
-- Missing `ok` responses usually mean weak Wi-Fi. Keep the drone close, reduce interference,
-  or adjust the timeout pads in `beta_config.py`.
-- Use the latest log in `logs/` to inspect command timings and SDK errors.
-- For manual experiments, the detector alone can be exercised via
-  `from beta_detect import FireDetector` and calling `infer(frame)`.
-
-Quick folder sanity
--------------------
-- `plans/` contains the waypoint JSONs.
-- `logs/` gathers flight logs when `--log` is provided.
-- YOLO weights live next to the scripts (`fire_model.pt`, etc.) and are referenced from
-  `beta_config.py`.
-à¹ŒRequaire Package
-
-pip install --upgrade pip
-pip install djitellopy pygame opencv-python ultralytics numpy
-
-FOR EXECUTING
-Drone Project - Run Guide
-
-Plan editor (make/inspect paths)
---------------------------------
-- Launch the planner GUI (saves to `plans/beta_waypoint.json` by default):
-  python beta_path_gui.py
-
-  Tips in GUI:
-  - Free mode: click to drop points; Z undo / Y redo; H back to base; L load last JSON.
-  - Grid mode: "Gen Grid" -> set width/height/cell; "Grid Dir" toggles X<->Y.
-  - "Save JSON" writes plans/beta_waypoint.json.
-
-Flying the plan (beta_main.py)
-------------------------------
-- Use the newest plan (beta_waypoint*.json under plans/), AI policy from config.py:
-  python beta_main.py --use-last
-
-- Use newest plan, force AI ON, policy 1 (approach & resume when lost):
-  python beta_main.py --use-last --ai on --mode 1
-
-- Use newest plan, force AI ON, policy 2 (approach & hold then resume):
-  python beta_main.py --use-last --ai on --mode 2
-
-- Use newest plan, force AI OFF (ignore --mode, just fly beta_waypoints):
-  python beta_main.py --use-last --ai off
-
-- Fly an explicit plan file:
-  python beta_main.py plans/beta_waypoint.json
-
-- Auto-create a timestamped log file (PowerShell/CMD empty string):
-  python beta_main.py --use-last --log=""
-
-- Write logs to a specific file:
-  python beta_main.py --use-last --log logs/flight_test.log
-
-- Respect config.py for AI enable/disable and policy (no CLI overrides for AI):
-  python beta_main.py --use-last --ai auto --mode 1
-  (With --ai auto, ON/OFF follows ENABLE_AI in config.py. If AI is OFF, --mode is ignored.)
-
-Dry run (no drone required)
+Target engagement behaviour
 ---------------------------
-- Review timing and distance without connecting to the Tello:
-  python dry_main.py --use-last
+When the detector sees a labelled target listed in `TARGET_SPECS`:
+1. Estimate the forward distance from the bounding-box width.
+2. Rotate, climb, or descend until the target is centered in the camera.
+3. Move forward/backward to reach the configured stand-off distance.
+4. Hold position while the target remains visible, then resume the waypoint route.
+Each engagement is logged to `flight_ai_*.log` with manoeuvres, distances, confidence, and dwell time.
 
-- Use an explicit plan file:
-  python dry_main.py plans/beta_waypoint.json
-
-Live camera view (real-time video)
-----------------------------------
-Option A - If beta_main.py supports --show-video (live view while flying):
-  python beta_main.py --use-last --ai on --mode 2 --show-video
-  (Close the window with 'q' or by clicking X.)
-
-Option B - Standalone viewer (no flying) using beta_detect.py (if CLI added):
-  python beta_detect.py --show --record out.mp4 --conf 0.5 --model yolov8s.pt
+Safety & retries (see `beta_config.py`)
+---------------------------------------
+- `RESPONSE_TIMEOUT_S`, `COMMAND_RETRY_COUNT` – base SDK timeout & retries.
+- `COMMAND_TIMEOUT_PAD` – adds distance-aware grace time (longer moves wait longer before retrying).
+- After a timeout the controller inspects telemetry (height, etc.) and skips retries if the move already succeeded.
+- `Ctrl+C` triggers `safe_land()`: tries SDK land, then RC descent, then `emergency` if necessary.
 
 Recommended first-flight flow
 -----------------------------
-1) Make a plan:
-   python beta_path_gui.py
-   (Save -> creates plans/beta_waypoint.json)
+1. Plan the path – `python beta_path_gui.py`, save to `plans/`.
+2. Dry run – `python dry_main.py --use-last`.
+3. Preview the stream – `python beta_detect.py` to confirm video.
+4. Indoor hover test – `python beta_main.py --use-last --show-video --log ""`.
+5. Full mission – same command outdoors, keeping the drone in view.
 
-2) Dry-run the plan:
-   python dry_main.py --use-last
+Troubleshooting tips
+--------------------
+- If `streamon` fails, the script logs a warning and keeps flying without detection/preview.
+- Missing `ok` replies typically mean weak Wi-Fi; keep the drone close or tweak timeout pads.
+- Video requires UDP port 11111 (and telemetry needs 8890) open in your firewall.
+- Check `logs/flight_*.log` and `logs/flight_ai_*.log` after each mission for command timing and engagement details.
+- For manual experiments, call `beta_detect.FireDetector.infer(frame)` to retrieve offsets/confidence from a frame.
 
-3) Test flight with AI OFF:
-   python beta_main.py --use-last --ai off --log=""
-
-4) Flight with AI ON, policy 2 (approach+hold):
-   python beta_main.py --use-last --ai on --mode 2 --log=""
-
-Notes & gotchas
----------------
-- If you see "JSON not found", ensure the planner saved into `plans/` or pass the full path.
-- In PowerShell/CMD, an empty string is `""`; in bash, use ''.
-- Ctrl+C during flight triggers a safe landing in the script.
-- If AI is ON but streamon() fails, the script logs a warning and continues without AI.
-- Logs always go to console; add `--log=""` for an auto timestamped file under `logs/`.
-- The YOLO model path defaults to `fire_model.pt` located beside these scripts; update `beta_config.py` if you relocate the weights.
-
-Folder expectations
+Compatibility notes
 -------------------
-- beta_path_gui.py, beta_main.py, beta_detect.py, dry_main.py at project root.
-- plans/    (planner writes beta_waypoint.json here)
-- logs/     (optional: beta_main.py writes log files here when --log is used)
+- Works on Python 3.8+ (no pattern matching or `|` unions).
+- Requires `djitellopy`, `opencv-python`, `ultralytics`, `numpy`, and `av`.
+- Place YOLO weights next to the scripts and set `YOLO_MODEL_PATH` in `beta_config.py`.

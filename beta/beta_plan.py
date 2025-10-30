@@ -5,12 +5,10 @@ Shared plan utilities for the beta mission scripts.
 Separated from beta_main.py so that dry-run tooling can reuse the
 parsing logic without importing djitellopy (which requires hardware).
 """
-from __future__ import annotations
-
 import json
 import math
 from pathlib import Path
-from typing import Iterable, List, Sequence, Tuple
+from typing import Iterable, List, Sequence, Tuple, Union, Optional
 
 # Plans live next to the flight scripts
 BASE_DIR = Path(__file__).resolve().parent
@@ -57,7 +55,7 @@ def _initial_heading_from_pos(pos0: Sequence[float], pos1: Sequence[float]) -> f
     return _angle_signed((1.0, 0.0), _vec(pos0, pos1))
 
 
-def load_plan(json_path: str | Path) -> Tuple[List[Tuple[int, int]], dict]:
+def load_plan(json_path: Union[str, Path]) -> Tuple[List[Tuple[int, int]], dict]:
     """
     Load beta_waypoint JSON and return [(turn_signed_deg, dist_cm), ...], meta dict.
     """
@@ -101,7 +99,7 @@ def load_plan(json_path: str | Path) -> Tuple[List[Tuple[int, int]], dict]:
     return segs, meta
 
 
-def find_latest_beta_waypoint_json() -> Path | None:
+def find_latest_beta_waypoint_json() -> Optional[Path]:
     """
     Find the most recently modified beta_waypoint JSON in the plans directory.
     """

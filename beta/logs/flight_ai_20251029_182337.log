@@ -1,0 +1,5 @@
+2025-10-29 18:24:00,838 Detected 'bottle' conf=0.54
+2025-10-29 18:24:00,950 Engaging target 'bottle' (conf=0.54)
+2025-10-29 18:24:00,950 Rotate CW 20 deg (dx=127.6)
+2025-10-29 18:24:02,507 Target lost during approach; aborting
+2025-10-29 18:24:02,508 Returning to pre-engagement position

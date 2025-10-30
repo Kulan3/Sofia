@@ -7,17 +7,15 @@ commands that beta_main.py would send to the drone, along with
 timing estimates. It never talks to hardware, so you can sanity
 check plans on any machine.
 """
-from __future__ import annotations
-
 import argparse
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import beta_config as C
 from beta_plan import PLAN_DIR, find_latest_beta_waypoint_json, load_plan
 
 
-def _format_seconds(seconds: float | None) -> str:
+def _format_seconds(seconds: Optional[float]) -> str:
     if seconds is None or seconds < 0:
         return "-"
     minutes = int(seconds // 60)
