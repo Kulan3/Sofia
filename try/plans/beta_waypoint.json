@@ -1,0 +1,50 @@
+{
+    "wp": [
+        {
+            "dist_cm": 156,
+            "dist_px": 52,
+            "angle_deg": 0,
+            "turn_signed_deg": 0
+        },
+        {
+            "dist_cm": 33,
+            "dist_px": 11,
+            "angle_deg": 86,
+            "turn_signed_deg": -86
+        },
+        {
+            "dist_cm": 157,
+            "dist_px": 52,
+            "angle_deg": 82,
+            "turn_signed_deg": -82
+        }
+    ],
+    "pos": [
+        [
+            380,
+            360
+        ],
+        [
+            432,
+            361
+        ],
+        [
+            431,
+            372
+        ],
+        [
+            380,
+            360
+        ]
+    ],
+    "meta": {
+        "mode": "FREE",
+        "speed_cm_s": 30,
+        "height_cm": 90,
+        "cm_per_px": 3.0,
+        "center_px": [
+            380,
+            360
+        ]
+    }
+}

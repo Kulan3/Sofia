@@ -1,0 +1,7 @@
+2025-10-29 13:36:27,464 INFO Logging to logs/flight_20251029_133627.log
+2025-10-29 13:36:27,464 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-29 13:36:27,466 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 13:36:27,466 INFO Connecting (attempt 1/4)...
+2025-10-29 13:36:27,469 INFO Send command: 'command'
+2025-10-29 13:36:34,517 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-29 13:36:34,518 INFO Send command: 'command'

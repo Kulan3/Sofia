@@ -1,0 +1,58 @@
+2025-10-30 15:40:19,759 INFO Logging to logs\flight_20251030_154019.log
+2025-10-30 15:40:19,760 INFO Altitude 90 cm, speed 30 cm/s
+2025-10-30 15:40:19,761 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-30 15:40:19,761 INFO Connecting (attempt 1/4)...
+2025-10-30 15:40:19,763 INFO Send command: 'command'
+2025-10-30 15:40:19,865 INFO Response command: 'ok'
+2025-10-30 15:40:19,866 INFO Battery 43%
+2025-10-30 15:40:19,869 INFO Send command: 'streamon'
+2025-10-30 15:40:19,970 INFO Response streamon: 'ok'
+2025-10-30 15:40:22,200 INFO Send command: 'speed 30'
+2025-10-30 15:40:22,202 INFO Response speed 30: 'ok'
+2025-10-30 15:40:22,202 INFO Takeoff.
+2025-10-30 15:40:22,203 INFO Send command: 'takeoff'
+2025-10-30 15:40:22,204 INFO Response takeoff: 'ok'
+2025-10-30 15:40:22,706 INFO Hovering for IMU stabilization (2.0s).
+2025-10-30 15:40:24,707 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-30 15:40:24,707 INFO Send command: 'up 40'
+2025-10-30 15:40:24,708 INFO Response up 40: 'ok'
+2025-10-30 15:40:24,909 INFO Send command: 'up 30'
+2025-10-30 15:40:25,311 INFO Response up 30: 'error Not joystick'
+2025-10-30 15:40:25,312 INFO Send command: 'up 30'
+2025-10-30 15:40:25,944 INFO Response up 30: 'error Not joystick'
+2025-10-30 15:40:25,945 INFO Send command: 'up 30'
+2025-10-30 15:40:26,849 INFO Response up 30: 'ok'
+2025-10-30 15:40:27,050 INFO [0] turn +1 deg
+2025-10-30 15:40:27,050 WARNING turn +1 deg below MIN_TURN_DEG (2); skipping.
+2025-10-30 15:40:27,050 INFO [0] forward total 156 cm
+2025-10-30 15:40:27,051 INFO Send command: 'forward 60'
+2025-10-30 15:40:28,257 INFO Response forward 60: 'ok'
+2025-10-30 15:40:28,458 INFO Send command: 'forward 60'
+2025-10-30 15:40:31,771 INFO Response forward 60: 'ok'
+2025-10-30 15:40:31,972 INFO Send command: 'forward 36'
+2025-10-30 15:40:34,180 INFO Response forward 36: 'ok'
+2025-10-30 15:40:34,381 INFO [1] turn -86 deg
+2025-10-30 15:40:34,381 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-30 15:40:34,582 INFO     turn chunk 1: CW 45 deg (rem 41)
+2025-10-30 15:40:34,583 INFO Send command: 'cw 45'
+2025-10-30 15:40:36,089 INFO Response cw 45: 'ok'
+2025-10-30 15:40:36,290 INFO Send command: 'cw 41'
+2025-10-30 15:40:37,596 INFO Response cw 41: 'ok'
+2025-10-30 15:40:37,797 INFO [1] forward total 33 cm
+2025-10-30 15:40:37,797 INFO Send command: 'forward 33'
+2025-10-30 15:40:39,605 INFO Response forward 33: 'ok'
+2025-10-30 15:40:39,806 INFO Target 'bottle' detected; engaging
+2025-10-30 15:40:39,994 INFO Send command: 'right 20'
+2025-10-30 15:40:41,899 INFO Response right 20: 'ok'
+2025-10-30 15:40:42,224 INFO Send command: 'up 20'
+2025-10-30 15:40:43,833 INFO Response up 20: 'ok'
+2025-10-30 15:40:44,177 INFO Send command: 'forward 30'
+2025-10-30 15:40:46,084 INFO Response forward 30: 'ok'
+2025-10-30 15:40:46,415 INFO Send command: 'forward 30'
+2025-10-30 15:40:48,324 INFO Response forward 30: 'ok'
+2025-10-30 15:40:49,325 ERROR KeyboardInterrupt - landing
+2025-10-30 15:40:49,325 INFO Send command: 'land'
+2025-10-30 15:40:51,935 INFO Response land: 'ok'
+2025-10-30 15:40:52,057 INFO Send command: 'streamoff'
+2025-10-30 15:40:52,158 INFO Response streamoff: 'ok'
+2025-10-30 15:40:52,159 INFO Done.

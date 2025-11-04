@@ -1,0 +1,14 @@
+2025-10-29 17:04:10,847 INFO Logging to logs/flight_20251029_170410.log
+2025-10-29 17:04:10,847 INFO Altitude 70 cm, speed 20 cm/s, AI=ON policy=2
+2025-10-29 17:04:10,849 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 17:04:10,849 INFO Connecting (attempt 1/4)...
+2025-10-29 17:04:10,851 INFO Send command: 'command'
+2025-10-29 17:04:10,952 INFO Response command: 'ok'
+2025-10-29 17:04:10,953 INFO Battery 69%
+2025-10-29 17:04:10,956 INFO Send command: 'streamon'
+2025-10-29 17:04:11,058 INFO Response streamon: 'ok'
+2025-10-29 17:04:13,237 INFO Send command: 'speed 20'
+2025-10-29 17:04:13,339 INFO Response speed 20: 'ok'
+2025-10-29 17:04:13,339 INFO Takeoff.
+2025-10-29 17:04:13,341 INFO Send command: 'takeoff'
+2025-10-29 17:04:20,419 INFO Send command: 'streamoff'
