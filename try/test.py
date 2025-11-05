@@ -14,7 +14,7 @@ print("Battery:", tello.get_battery())
 tello.streamon()
 
 # Load YOLOv8 model
-model = YOLO('yolov8s.pt', task='detect')
+model = YOLO('bp.pt', task='detect')
 
 # Get the latest frame reader
 frame_read = tello.get_frame_read(with_queue=False, max_queue_len=0)
