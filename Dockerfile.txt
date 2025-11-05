@@ -1,0 +1,41 @@
+FROM nvcr.io/nvidia/l4t-ml:r35.2.1-py3
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+# 1) Use the CUDA-enabled system OpenCV (4.5.0 on this L4T) and keep it pinned
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      git git-lfs python3-pygame python3-opencv \
+    && apt-mark hold python3-opencv \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2) Ensure no pip OpenCV wheels can override the system one
+RUN python3 -m pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python || true
+
+# 3) Git config (optional)
+RUN git lfs install --skip-repo && \
+    git config --global user.name "Kulan3" && \
+    git config --global user.email "nutthanondeeoam@gmail.com" && \
+    git config --global filter.lfs.clean "git-lfs clean -- %f" && \
+    git config --global filter.lfs.smudge "git-lfs smudge -- %f" && \
+    git config --global filter.lfs.process "git-lfs filter-process" && \
+    git config --global filter.lfs.required true
+
+# 4) Install your Python deps but DO NOT allow pip to drag in opencv-python
+#    Use --no-deps for ultralytics, then add common deps separately if needed
+RUN python3 -m pip install --no-cache-dir \
+      djitellopy==2.5.0 \
+  && python3 -m pip install --no-cache-dir --no-deps \
+      ultralytics==8.0.196 \
+  && python3 - <<'PY'
+import pkgutil, sys
+bad = [m for m in ['cv2','opencv','opencv-python','opencv-python-headless'] if m in [p.name for p in pkgutil.iter_modules()]]
+print("Sanity check, pip OpenCV present? ->", bad)
+PY
+
+WORKDIR /opt/mydrone
+COPY try/ ./try/
+
+# Quick verification on container start (optional)
+CMD bash -lc "python3 - <<'PY'\nimport cv2\nprint('OpenCV:', cv2.__version__)\nprint('CUDA enabled?', 'NVIDIA CUDA: YES' in cv2.getBuildInformation())\nprint(cv2.getBuildInformation().splitlines()[0])\nPY && /bin/bash"
