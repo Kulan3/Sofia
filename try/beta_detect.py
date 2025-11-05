@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Optional, Tuple, Callable
 
-JETSON_DIST_PACKAGES = "/usr/lib/python3/dist-packages"
+JETSON_DIST_PACKAGES = "/usr/lib/python3.8/dist-packages"
 if JETSON_DIST_PACKAGES not in sys.path and os.path.isdir(JETSON_DIST_PACKAGES):
     sys.path.insert(0, JETSON_DIST_PACKAGES)
 
