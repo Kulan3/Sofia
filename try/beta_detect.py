@@ -10,11 +10,26 @@ import time
 from pathlib import Path
 from typing import Optional, Tuple, Callable
 
-import cv2
 import numpy as np
 from ultralytics import YOLO
 
 import beta_config as C
+
+try:
+    import cv2  # type: ignore
+    if not hasattr(cv2, "_registerMatType"):
+        raise AttributeError("_registerMatType missing")
+except AttributeError as exc:
+    if "_registerMatType" in str(exc):
+        import importlib
+        import sys
+
+        sys.modules.pop("cv2", None)
+        cv2 = importlib.import_module("cv2.cv2")  # type: ignore
+    else:
+        raise
+except ModuleNotFoundError:
+    raise
 
 
 class FireDetection:
