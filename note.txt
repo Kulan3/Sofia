@@ -1,1 +1,4 @@
 sudo docker exec -it fb72edebd145 /bin/bash
+
+--build-arg JOBS=1
+docker build -t sofia:v4.0 .
