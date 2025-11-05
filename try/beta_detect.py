@@ -5,15 +5,15 @@ Simplified fire detection helper compatible with Python 3.8.
 Only performs YOLO inference and optional frame display/recording.
 """
 import os
+import sys
 import threading
 import time
 from pathlib import Path
 from typing import Optional, Tuple, Callable
 
-import numpy as np
-from ultralytics import YOLO
-
-import beta_config as C
+JETSON_DIST_PACKAGES = "/usr/lib/python3/dist-packages"
+if JETSON_DIST_PACKAGES not in sys.path and os.path.isdir(JETSON_DIST_PACKAGES):
+    sys.path.insert(0, JETSON_DIST_PACKAGES)
 
 try:
     import cv2  # type: ignore
@@ -22,14 +22,20 @@ try:
 except AttributeError as exc:
     if "_registerMatType" in str(exc):
         import importlib
-        import sys
 
         sys.modules.pop("cv2", None)
         cv2 = importlib.import_module("cv2.cv2")  # type: ignore
+        if not hasattr(cv2, "_registerMatType"):
+            raise
     else:
         raise
 except ModuleNotFoundError:
     raise
+
+import numpy as np
+from ultralytics import YOLO
+
+import beta_config as C
 
 
 class FireDetection:
