@@ -1,0 +1,51 @@
+2025-11-06 19:49:56,566 Detected 'bottle' conf=0.59
+2025-11-06 19:49:56,566 Engaging target 'bottle' (conf=0.59)
+2025-11-06 19:49:56,566 Yaw to center target by -28 deg
+2025-11-06 19:49:58,109 Yaw to center target by +9 deg
+2025-11-06 19:49:59,213 Forward 30 cm towards target (distance 1.21 m)
+2025-11-06 19:50:01,500 Yaw to center target by +3 deg
+2025-11-06 19:50:02,003 Forward 30 cm towards target (distance 1.15 m)
+2025-11-06 19:50:04,096 Yaw to center target by +4 deg
+2025-11-06 19:50:04,698 Forward 30 cm towards target (distance 1.15 m)
+2025-11-06 19:50:07,395 Yaw to center target by +2 deg
+2025-11-06 19:50:07,697 Forward 30 cm towards target (distance 1.06 m)
+2025-11-06 19:50:10,007 Forward 30 cm towards target (distance 0.79 m)
+2025-11-06 19:50:12,180 Yaw to center target by +2 deg
+2025-11-06 19:50:12,482 Forward 30 cm towards target (distance 0.91 m)
+2025-11-06 19:50:14,772 Yaw to center target by +3 deg
+2025-11-06 19:50:15,375 Forward 30 cm towards target (distance 0.82 m)
+2025-11-06 19:50:17,673 Yaw to center target by +2 deg
+2025-11-06 19:50:17,975 Forward 30 cm towards target (distance 0.75 m)
+2025-11-06 19:50:20,564 Target lost during approach
+2025-11-06 19:50:20,565 Unable to reach desired distance; skipping hold
+2025-11-06 19:50:20,565 Moving back 240 cm to resume route
+2025-11-06 19:50:29,301 Restoring heading by +15.0 deg
+2025-11-06 19:50:33,619 Detected 'bottle' conf=0.29
+2025-11-06 19:50:33,620 Engaging target 'bottle' (conf=0.29)
+2025-11-06 19:50:33,620 Yaw to center target by +21 deg
+2025-11-06 19:50:34,979 Yaw to center target by +21 deg
+2025-11-06 19:50:36,184 Forward 30 cm towards target (distance 1.15 m)
+2025-11-06 19:50:38,361 Yaw to center target by -33 deg
+2025-11-06 19:50:39,766 Forward 30 cm towards target (distance 0.94 m)
+2025-11-06 19:50:42,065 Yaw to center target by +11 deg
+2025-11-06 19:50:43,170 Forward 30 cm towards target (distance 1.06 m)
+2025-11-06 19:50:45,243 Yaw to center target by +2 deg
+2025-11-06 19:50:45,544 Forward 30 cm towards target (distance 0.91 m)
+2025-11-06 19:50:47,674 Yaw to center target by +4 deg
+2025-11-06 19:50:48,278 Forward 30 cm towards target (distance 0.79 m)
+2025-11-06 19:50:51,186 Yaw to center target by +6 deg
+2025-11-06 19:50:51,989 Forward 30 cm towards target (distance 0.82 m)
+2025-11-06 19:50:54,204 Forward 30 cm towards target (distance 0.60 m)
+2025-11-06 19:50:56,416 Target lost during approach
+2025-11-06 19:50:56,416 Unable to reach desired distance; skipping hold
+2025-11-06 19:50:56,416 Moving back 210 cm to resume route
+2025-11-06 19:51:03,944 Restoring heading by -23.0 deg
+2025-11-06 19:51:08,759 Detected 'bottle' conf=0.50
+2025-11-06 19:51:08,759 Engaging target 'bottle' (conf=0.50)
+2025-11-06 19:51:08,759 Yaw to center target by -32 deg
+2025-11-06 19:51:10,300 Yaw to center target by -32 deg
+2025-11-06 19:51:11,706 Forward 30 cm towards target (distance 0.85 m)
+2025-11-06 19:51:13,903 Target lost during approach
+2025-11-06 19:51:13,903 Unable to reach desired distance; skipping hold
+2025-11-06 19:51:13,903 Moving back 30 cm to resume route
+2025-11-06 19:51:15,811 Restoring heading by +60.0 deg

@@ -1,0 +1,16 @@
+2025-11-06 17:34:11,803 INFO Logging to logs\flight_20251106_173411.log
+2025-11-06 17:34:11,804 INFO Altitude 90 cm, speed 30 cm/s
+2025-11-06 17:34:11,805 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-11-06 17:34:11,806 INFO Connecting (attempt 1/4)...
+2025-11-06 17:34:11,808 INFO Send command: 'command'
+2025-11-06 17:34:11,808 WARNING connect error: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-11-06 17:34:12,809 INFO Connecting (attempt 2/4)...
+2025-11-06 17:34:12,811 INFO Send command: 'command'
+2025-11-06 17:34:12,812 WARNING connect error: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-11-06 17:34:13,813 INFO Connecting (attempt 3/4)...
+2025-11-06 17:34:13,815 INFO Send command: 'command'
+2025-11-06 17:34:13,815 WARNING connect error: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-11-06 17:34:14,816 INFO Connecting (attempt 4/4)...
+2025-11-06 17:34:14,818 INFO Send command: 'command'
+2025-11-06 17:34:14,818 WARNING connect error: [WinError 10051] A socket operation was attempted to an unreachable network
+2025-11-06 17:34:15,819 ERROR Unable to connect. Check TELLO Wi-Fi / power / close other Tello apps.

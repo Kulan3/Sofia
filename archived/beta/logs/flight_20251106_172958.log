@@ -1,0 +1,30 @@
+2025-11-06 17:29:58,525 INFO Logging to logs\flight_20251106_172958.log
+2025-11-06 17:29:58,526 INFO Altitude 90 cm, speed 30 cm/s
+2025-11-06 17:29:58,528 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-11-06 17:29:58,528 INFO Connecting (attempt 1/4)...
+2025-11-06 17:29:58,530 INFO Send command: 'command'
+2025-11-06 17:29:58,631 INFO Response command: 'ok'
+2025-11-06 17:29:58,632 INFO Battery 53%
+2025-11-06 17:29:58,634 INFO Send command: 'streamon'
+2025-11-06 17:29:58,735 INFO Response streamon: 'ok'
+2025-11-06 17:30:01,012 INFO Send command: 'speed 30'
+2025-11-06 17:30:01,116 INFO Response speed 30: 'ok'
+2025-11-06 17:30:01,119 INFO Takeoff.
+2025-11-06 17:30:01,124 INFO Send command: 'takeoff'
+2025-11-06 17:30:09,959 INFO Response takeoff: 'ok'
+2025-11-06 17:30:10,461 INFO Hovering for IMU stabilization (2.0s).
+2025-11-06 17:30:12,463 INFO     climb chunk 1: 40 cm (rem 30)
+2025-11-06 17:30:12,465 INFO Send command: 'up 40'
+2025-11-06 17:30:14,773 INFO Response up 40: 'ok'
+2025-11-06 17:30:14,974 INFO Send command: 'up 30'
+2025-11-06 17:30:18,085 INFO Response up 30: 'ok'
+2025-11-06 17:30:18,286 INFO [0] turn +1 deg
+2025-11-06 17:30:18,287 WARNING turn +1 deg below MIN_TURN_DEG (2); skipping.
+2025-11-06 17:30:18,288 INFO [0] forward total 156 cm
+2025-11-06 17:30:18,288 INFO Send command: 'forward 60'
+2025-11-06 17:30:21,298 INFO Response forward 60: 'ok'
+2025-11-06 17:30:21,499 INFO Send command: 'forward 60'
+2025-11-06 17:30:23,401 ERROR KeyboardInterrupt - landing
+2025-11-06 17:30:23,402 INFO Send command: 'land'
+2025-11-06 17:30:23,647 INFO Send command: 'land'
+2025-11-06 17:30:23,648 INFO Response land: 'error Auto land'

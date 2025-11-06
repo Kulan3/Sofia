@@ -1,0 +1,8 @@
+2025-11-06 19:44:13,797 Detected 'bottle' conf=0.55
+2025-11-06 19:44:13,797 Engaging target 'bottle' (conf=0.55)
+2025-11-06 19:44:13,797 Yaw to center target by +17 deg
+2025-11-06 19:44:15,069 Yaw to center target by -4 deg
+2025-11-06 19:44:15,672 Forward 80 cm towards target (distance 1.10 m)
+2025-11-06 19:44:19,989 Unable to reach desired distance; skipping hold
+2025-11-06 19:44:19,989 Moving back 80 cm to resume route
+2025-11-06 19:44:23,701 Restoring heading by -14.0 deg

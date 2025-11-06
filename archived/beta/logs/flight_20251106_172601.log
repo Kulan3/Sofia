@@ -1,0 +1,58 @@
+2025-11-06 17:26:01,753 INFO Logging to logs\flight_20251106_172601.log
+2025-11-06 17:26:01,754 INFO Altitude 90 cm, speed 30 cm/s
+2025-11-06 17:26:01,755 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-11-06 17:26:01,755 INFO Connecting (attempt 1/4)...
+2025-11-06 17:26:01,757 INFO Send command: 'command'
+2025-11-06 17:26:01,858 INFO Response command: 'ok'
+2025-11-06 17:26:01,859 INFO Battery 63%
+2025-11-06 17:26:01,860 INFO Send command: 'streamon'
+2025-11-06 17:26:01,960 INFO Response streamon: 'ok'
+2025-11-06 17:26:04,205 INFO Send command: 'speed 30'
+2025-11-06 17:26:04,309 INFO Response speed 30: 'ok'
+2025-11-06 17:26:04,309 INFO Takeoff.
+2025-11-06 17:26:04,312 INFO Send command: 'takeoff'
+2025-11-06 17:26:13,043 INFO Response takeoff: 'ok'
+2025-11-06 17:26:13,544 INFO Hovering for IMU stabilization (2.0s).
+2025-11-06 17:26:15,545 INFO     climb chunk 1: 40 cm (rem 30)
+2025-11-06 17:26:15,545 INFO Send command: 'up 40'
+2025-11-06 17:26:19,760 INFO Response up 40: 'ok'
+2025-11-06 17:26:19,960 INFO Send command: 'up 30'
+2025-11-06 17:26:26,985 INFO Response up 30: 'ok'
+2025-11-06 17:26:27,186 INFO [0] turn +1 deg
+2025-11-06 17:26:27,186 WARNING turn +1 deg below MIN_TURN_DEG (2); skipping.
+2025-11-06 17:26:27,186 INFO [0] forward total 156 cm
+2025-11-06 17:26:27,186 INFO Send command: 'forward 60'
+2025-11-06 17:26:34,209 WARNING Aborting command 'forward 60'. Did not receive a response after 7 seconds
+2025-11-06 17:26:34,210 INFO Send command: 'forward 60'
+2025-11-06 17:26:37,823 INFO Response forward 60: 'ok'
+2025-11-06 17:26:38,023 INFO Send command: 'forward 60'
+2025-11-06 17:26:44,347 INFO Response forward 60: 'ok'
+2025-11-06 17:26:44,548 INFO Send command: 'forward 36'
+2025-11-06 17:26:47,660 INFO Response forward 36: 'ok'
+2025-11-06 17:26:47,883 INFO [1] turn -86 deg
+2025-11-06 17:26:47,907 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-11-06 17:26:48,115 INFO     turn chunk 1: CW 45 deg (rem 41)
+2025-11-06 17:26:48,115 INFO Send command: 'cw 45'
+2025-11-06 17:26:49,622 INFO Response cw 45: 'ok'
+2025-11-06 17:26:49,823 INFO Send command: 'cw 41'
+2025-11-06 17:26:51,431 INFO Response cw 41: 'ok'
+2025-11-06 17:26:51,632 INFO [1] forward total 33 cm
+2025-11-06 17:26:51,633 INFO Send command: 'forward 33'
+2025-11-06 17:26:53,439 INFO Response forward 33: 'ok'
+2025-11-06 17:26:53,641 INFO [2] turn -82 deg
+2025-11-06 17:26:53,641 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-11-06 17:26:53,842 INFO     turn chunk 1: CW 45 deg (rem 37)
+2025-11-06 17:26:53,842 INFO Send command: 'cw 45'
+2025-11-06 17:26:55,149 INFO Response cw 45: 'ok'
+2025-11-06 17:26:55,350 INFO Send command: 'cw 37'
+2025-11-06 17:26:56,554 INFO Response cw 37: 'ok'
+2025-11-06 17:26:56,755 INFO [2] forward total 157 cm
+2025-11-06 17:26:56,756 INFO Send command: 'forward 60'
+2025-11-06 17:26:59,142 ERROR KeyboardInterrupt - landing
+2025-11-06 17:26:59,142 INFO Send command: 'land'
+2025-11-06 17:26:59,343 INFO Response land: 'error Auto land'
+2025-11-06 17:26:59,344 INFO Send command: 'land'
+2025-11-06 17:27:02,857 INFO Response land: 'ok'
+2025-11-06 17:27:03,015 INFO Send command: 'streamoff'
+2025-11-06 17:27:03,015 INFO Response streamoff: 'ok'
+2025-11-06 17:27:03,015 INFO Done.

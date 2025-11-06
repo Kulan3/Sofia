@@ -1,0 +1,20 @@
+2025-11-06 17:29:06,783 INFO Logging to logs\flight_20251106_172906.log
+2025-11-06 17:29:06,784 INFO Altitude 90 cm, speed 30 cm/s
+2025-11-06 17:29:06,786 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-11-06 17:29:06,786 INFO Connecting (attempt 1/4)...
+2025-11-06 17:29:06,788 INFO Send command: 'command'
+2025-11-06 17:29:06,889 INFO Response command: 'ok'
+2025-11-06 17:29:06,891 INFO Battery 53%
+2025-11-06 17:29:06,893 INFO Send command: 'streamon'
+2025-11-06 17:29:06,996 INFO Response streamon: 'ok'
+2025-11-06 17:29:09,274 INFO Send command: 'speed 30'
+2025-11-06 17:29:09,375 INFO Response speed 30: 'ok'
+2025-11-06 17:29:09,377 INFO Takeoff.
+2025-11-06 17:29:09,379 INFO Send command: 'takeoff'
+2025-11-06 17:29:15,098 INFO Response takeoff: 'ok'
+2025-11-06 17:29:18,069 INFO Hovering for IMU stabilization (2.0s).
+2025-11-06 17:29:20,071 INFO     climb chunk 1: 40 cm (rem 30)
+2025-11-06 17:29:20,071 INFO Send command: 'up 40'
+2025-11-06 17:29:22,584 INFO Response up 40: 'ok'
+2025-11-06 17:29:22,785 INFO Send command: 'up 30'
+2025-11-06 17:29:24,689 INFO Send command: 'land'

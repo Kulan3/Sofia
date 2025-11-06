@@ -1,0 +1,17 @@
+2025-10-29 18:56:24,951 Detected 'bottle' conf=0.58
+2025-10-29 18:56:25,045 Engaging target 'bottle' (conf=0.58)
+2025-10-29 18:56:25,200 Rotate CW 19 deg (dx=115.4)
+2025-10-29 18:56:26,619 Target lost during approach; aborting
+2025-10-29 18:56:26,620 Approach failed; returning
+2025-10-29 18:56:26,620 Returning to pre-engagement position
+2025-10-29 18:56:31,144 Detected 'bottle' conf=0.21
+2025-10-29 18:56:31,205 Engaging target 'bottle' (conf=0.21)
+2025-10-29 18:56:31,349 Rotate CW 20 deg (dx=230.6)
+2025-10-29 18:56:32,578 Rotate CCW 7 deg (dx=-45.7)
+2025-10-29 18:56:33,806 Move down 20 cm (dy=322.8)
+2025-10-29 18:56:36,537 Move down 20 cm (dy=127.7)
+2025-10-29 18:56:38,663 Rotate CCW 8 deg (dx=-48.7)
+2025-10-29 18:56:39,679 Move up 20 cm (dy=-92.1)
+2025-10-29 18:56:41,605 Target lost during approach; aborting
+2025-10-29 18:56:41,605 Approach failed; returning
+2025-10-29 18:56:41,605 Returning to pre-engagement position

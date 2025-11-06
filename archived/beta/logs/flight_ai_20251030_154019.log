@@ -1,0 +1,7 @@
+2025-10-30 15:40:39,806 Detected 'bottle' conf=0.21
+2025-10-30 15:40:39,807 Engaging target 'bottle' (conf=0.21)
+2025-10-30 15:40:39,807 Planned path -> yaw +0 deg, strafe +20 cm, vertical -20 cm, forward 76 cm
+2025-10-30 15:40:39,992 move right 20 cm
+2025-10-30 15:40:42,224 move up 20 cm
+2025-10-30 15:40:44,177 move forward 30 cm
+2025-10-30 15:40:46,414 move forward 30 cm

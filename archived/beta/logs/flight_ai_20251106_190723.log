@@ -1,0 +1,10 @@
+2025-11-06 19:07:41,574 Detected 'bottle' conf=0.54
+2025-11-06 19:07:41,575 Engaging target 'bottle' (conf=0.54)
+2025-11-06 19:07:41,575 Planned path -> yaw +0 deg, strafe -50 cm, vertical +20 cm, forward 45 cm
+2025-11-06 19:07:41,754 move left 25 cm
+2025-11-06 19:07:44,501 move left 25 cm
+2025-11-06 19:07:47,554 move down 20 cm
+2025-11-06 19:07:50,484 move forward 30 cm
+2025-11-06 19:07:50,842 Holding position until target lost
+2025-11-06 19:07:51,310 Target lost; returning to route
+2025-11-06 19:07:51,310 Returning to pre-engagement position

@@ -1,0 +1,40 @@
+2025-10-30 15:37:08,320 INFO Logging to logs\flight_20251030_153708.log
+2025-10-30 15:37:08,321 INFO Altitude 90 cm, speed 30 cm/s
+2025-10-30 15:37:08,322 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-30 15:37:08,322 INFO Connecting (attempt 1/4)...
+2025-10-30 15:37:08,324 INFO Send command: 'command'
+2025-10-30 15:37:08,425 INFO Response command: 'ok'
+2025-10-30 15:37:08,476 INFO Battery 81%
+2025-10-30 15:37:08,529 INFO Send command: 'streamon'
+2025-10-30 15:37:08,631 INFO Response streamon: 'ok'
+2025-10-30 15:37:10,972 INFO Send command: 'speed 30'
+2025-10-30 15:37:11,075 INFO Response speed 30: 'ok'
+2025-10-30 15:37:11,076 INFO Takeoff.
+2025-10-30 15:37:11,078 INFO Send command: 'takeoff'
+2025-10-30 15:37:19,917 INFO Response takeoff: 'ok'
+2025-10-30 15:37:20,418 INFO Hovering for IMU stabilization (2.0s).
+2025-10-30 15:37:22,419 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-30 15:37:22,419 INFO Send command: 'up 40'
+2025-10-30 15:37:25,330 INFO Response up 40: 'ok'
+2025-10-30 15:37:25,531 INFO Send command: 'up 30'
+2025-10-30 15:37:27,842 INFO Response up 30: 'ok'
+2025-10-30 15:37:28,044 INFO [0] forward total 150 cm
+2025-10-30 15:37:28,044 INFO Send command: 'forward 60'
+2025-10-30 15:37:31,156 INFO Response forward 60: 'ok'
+2025-10-30 15:37:31,358 INFO Send command: 'forward 60'
+2025-10-30 15:37:34,568 INFO Response forward 60: 'ok'
+2025-10-30 15:37:34,769 INFO Send command: 'forward 30'
+2025-10-30 15:37:36,480 INFO Response forward 30: 'ok'
+2025-10-30 15:37:36,681 INFO [1] forward total 150 cm
+2025-10-30 15:37:36,681 INFO Send command: 'forward 60'
+2025-10-30 15:37:39,794 INFO Response forward 60: 'ok'
+2025-10-30 15:37:39,995 INFO Send command: 'forward 60'
+2025-10-30 15:37:43,106 INFO Response forward 60: 'ok'
+2025-10-30 15:37:43,308 INFO Send command: 'forward 30'
+2025-10-30 15:37:45,016 INFO Response forward 30: 'ok'
+2025-10-30 15:37:45,217 INFO Mission complete. Landing.
+2025-10-30 15:37:45,218 INFO Send command: 'land'
+2025-10-30 15:37:49,832 INFO Response land: 'ok'
+2025-10-30 15:37:49,953 INFO Send command: 'streamoff'
+2025-10-30 15:37:50,054 INFO Response streamoff: 'ok'
+2025-10-30 15:37:50,054 INFO Done.

@@ -1,0 +1,149 @@
+2025-10-28 18:36:33,279 INFO Logging to logs/flight_20251028_183633.log
+2025-10-28 18:36:33,280 INFO Altitude 90 cm, speed 30 cm/s, AI=ON policy=2
+2025-10-28 18:36:33,282 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-28 18:36:33,282 INFO Connecting (attempt 1/4)...
+2025-10-28 18:36:33,285 INFO Send command: 'command'
+2025-10-28 18:36:33,385 ERROR 'utf-8' codec can't decode byte 0xcc in position 0: invalid continuation byte
+2025-10-28 18:36:33,387 INFO Send command: 'command'
+2025-10-28 18:36:33,387 INFO Response command: 'ok'
+2025-10-28 18:36:33,438 INFO Battery 80%
+2025-10-28 18:36:33,489 INFO Send command: 'streamon'
+2025-10-28 18:36:33,490 INFO Response streamon: 'ok'
+2025-10-28 18:36:35,611 INFO Send command: 'speed 30'
+2025-10-28 18:36:35,613 INFO Response speed 30: 'ok'
+2025-10-28 18:36:35,614 INFO Takeoff.
+2025-10-28 18:36:35,615 INFO Send command: 'takeoff'
+2025-10-28 18:36:35,717 INFO Response takeoff: 'ok'
+2025-10-28 18:36:36,219 INFO Hovering for IMU stabilization (2.0s).
+2025-10-28 18:36:38,222 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-28 18:36:38,223 INFO Send command: 'up 40'
+2025-10-28 18:36:38,967 INFO Response up 40: 'error Not joystick'
+2025-10-28 18:36:38,969 INFO Send command: 'up 40'
+2025-10-28 18:36:39,570 INFO Response up 40: 'error Not joystick'
+2025-10-28 18:36:39,572 INFO Send command: 'up 40'
+2025-10-28 18:36:40,173 INFO Response up 40: 'error Not joystick'
+2025-10-28 18:36:40,175 INFO Send command: 'up 40'
+2025-10-28 18:36:40,777 INFO Response up 40: 'error Not joystick'
+2025-10-28 18:36:40,780 WARNING move_up failed (Command 'up 40' was unsuccessful for 5 tries. Latest response:	'error Not joystick'); retry 1/5 (IMU not ready).
+2025-10-28 18:36:42,284 INFO Send command: 'up 40'
+2025-10-28 18:36:42,887 INFO Response up 40: 'error Not joystick'
+2025-10-28 18:36:42,889 INFO Send command: 'up 40'
+2025-10-28 18:36:43,493 INFO Response up 40: 'error Not joystick'
+2025-10-28 18:36:43,495 INFO Send command: 'up 40'
+2025-10-28 18:36:44,403 INFO Response up 40: 'ok'
+2025-10-28 18:36:44,604 INFO Send command: 'up 30'
+2025-10-28 18:36:45,707 INFO Response up 30: 'ok'
+2025-10-28 18:36:46,129 INFO [0] turn +178 deg
+2025-10-28 18:36:46,131 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 18:36:46,337 INFO     turn chunk 1: CCW 45 deg (rem 133)
+2025-10-28 18:36:46,338 INFO Send command: 'ccw 45'
+2025-10-28 18:36:47,742 INFO Response ccw 45: 'ok'
+2025-10-28 18:36:47,943 INFO     turn chunk 2: CCW 45 deg (rem 88)
+2025-10-28 18:36:47,943 INFO Send command: 'ccw 45'
+2025-10-28 18:36:49,354 INFO Response ccw 45: 'ok'
+2025-10-28 18:36:49,555 INFO     turn chunk 3: CCW 45 deg (rem 43)
+2025-10-28 18:36:49,555 INFO Send command: 'ccw 45'
+2025-10-28 18:36:50,861 INFO Response ccw 45: 'ok'
+2025-10-28 18:36:51,062 INFO     turn chunk 4: CCW 43 deg (rem 0)
+2025-10-28 18:36:51,062 INFO Send command: 'ccw 43'
+2025-10-28 18:36:52,565 INFO Response ccw 43: 'ok'
+2025-10-28 18:36:52,767 INFO [0] forward total 99 cm
+2025-10-28 18:36:52,767 INFO Send command: 'forward 60'
+2025-10-28 18:36:55,674 INFO Response forward 60: 'ok'
+2025-10-28 18:36:55,876 INFO Send command: 'forward 39'
+2025-10-28 18:36:57,880 INFO Response forward 39: 'ok'
+2025-10-28 18:36:58,082 INFO [1] turn -81 deg
+2025-10-28 18:36:58,083 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 18:36:58,284 INFO     turn chunk 1: CW 45 deg (rem 36)
+2025-10-28 18:36:58,285 INFO Send command: 'cw 45'
+2025-10-28 18:36:59,691 INFO Response cw 45: 'ok'
+2025-10-28 18:36:59,893 INFO     turn chunk 2: CW 36 deg (rem 0)
+2025-10-28 18:36:59,894 INFO Send command: 'cw 36'
+2025-10-28 18:37:01,497 INFO Response cw 36: 'ok'
+2025-10-28 18:37:01,838 INFO [1] forward total 76 cm
+2025-10-28 18:37:01,839 INFO Send command: 'forward 60'
+2025-10-28 18:37:04,944 INFO Response forward 60: 'ok'
+2025-10-28 18:37:05,145 INFO [2] turn -95 deg
+2025-10-28 18:37:05,145 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 18:37:05,347 INFO     turn chunk 1: CW 45 deg (rem 50)
+2025-10-28 18:37:05,348 INFO Send command: 'cw 45'
+2025-10-28 18:37:06,656 INFO Response cw 45: 'ok'
+2025-10-28 18:37:06,996 INFO     turn chunk 2: CW 45 deg (rem 5)
+2025-10-28 18:37:06,997 INFO Send command: 'cw 45'
+2025-10-28 18:37:08,500 INFO Response cw 45: 'ok'
+2025-10-28 18:37:08,701 INFO     turn chunk 3: CW 5 deg (rem 0)
+2025-10-28 18:37:08,701 INFO Send command: 'cw 5'
+2025-10-28 18:37:09,103 INFO Response cw 5: 'ok'
+2025-10-28 18:37:09,304 INFO [2] forward total 93 cm
+2025-10-28 18:37:09,304 INFO Send command: 'forward 60'
+2025-10-28 18:37:12,310 INFO Response forward 60: 'ok'
+2025-10-28 18:37:12,651 INFO Send command: 'forward 33'
+2025-10-28 18:37:14,458 INFO Response forward 33: 'ok'
+2025-10-28 18:37:14,660 INFO [3] turn -89 deg
+2025-10-28 18:37:14,660 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 18:37:14,861 INFO     turn chunk 1: CW 45 deg (rem 44)
+2025-10-28 18:37:14,862 INFO Send command: 'cw 45'
+2025-10-28 18:37:16,467 INFO Response cw 45: 'ok'
+2025-10-28 18:37:16,668 INFO     turn chunk 2: CW 44 deg (rem 0)
+2025-10-28 18:37:16,669 INFO Send command: 'cw 44'
+2025-10-28 18:37:18,075 INFO Response cw 44: 'ok'
+2025-10-28 18:37:18,277 INFO [3] forward total 69 cm
+2025-10-28 18:37:18,277 INFO Send command: 'forward 60'
+2025-10-28 18:37:21,175 INFO Response forward 60: 'ok'
+2025-10-28 18:37:21,376 INFO Mission complete. Landing.
+2025-10-28 18:37:21,377 INFO Send command: 'land'
+2025-10-28 18:37:21,478 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:21,480 INFO Send command: 'land'
+2025-10-28 18:37:21,580 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:21,582 INFO Send command: 'land'
+2025-10-28 18:37:21,683 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:21,685 INFO Send command: 'land'
+2025-10-28 18:37:21,785 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:21,788 INFO Send command: 'command'
+2025-10-28 18:37:21,888 INFO Response command: 'ok'
+2025-10-28 18:37:21,889 WARNING Sent 'command' to re-sync SDK mode.
+2025-10-28 18:37:22,090 WARNING land retrying after command-mode recovery (1/2).
+2025-10-28 18:37:22,292 INFO Send command: 'land'
+2025-10-28 18:37:22,396 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:22,397 INFO Send command: 'land'
+2025-10-28 18:37:22,498 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:22,500 INFO Send command: 'land'
+2025-10-28 18:37:22,600 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:22,601 INFO Send command: 'land'
+2025-10-28 18:37:22,702 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:22,703 INFO Send command: 'command'
+2025-10-28 18:37:22,804 INFO Response command: 'ok'
+2025-10-28 18:37:22,805 WARNING Sent 'command' to re-sync SDK mode.
+2025-10-28 18:37:23,005 WARNING land retrying after command-mode recovery (2/2).
+2025-10-28 18:37:23,206 INFO Send command: 'land'
+2025-10-28 18:37:23,308 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:23,386 INFO Send command: 'land'
+2025-10-28 18:37:23,489 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:23,492 INFO Send command: 'land'
+2025-10-28 18:37:23,593 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:23,594 INFO Send command: 'land'
+2025-10-28 18:37:23,695 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:23,697 INFO Send command: 'command'
+2025-10-28 18:37:23,797 INFO Response command: 'ok'
+2025-10-28 18:37:23,798 WARNING Sent 'command' to re-sync SDK mode.
+2025-10-28 18:37:23,999 WARNING land retrying after command-mode recovery (3/2).
+2025-10-28 18:37:24,200 ERROR land failed after 3 tries: Command 'land' was unsuccessful for 5 tries. Latest response:	'unknown command: land`P'
+2025-10-28 18:37:24,201 WARNING land error: Command 'land' was unsuccessful for 5 tries. Latest response:	'unknown command: land`P'
+2025-10-28 18:37:24,201 INFO Send command: 'command'
+2025-10-28 18:37:24,302 INFO Response command: 'ok'
+2025-10-28 18:37:24,305 WARNING Sent 'command' to re-sync SDK mode.
+2025-10-28 18:37:24,506 WARNING Attempting RC descent fallback.
+2025-10-28 18:37:24,507 INFO Send command (no response expected): 'rc 0 0 -20 0'
+2025-10-28 18:37:27,010 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 18:37:28,012 INFO Send command: 'streamoff'
+2025-10-28 18:37:28,113 INFO Response streamoff: 'ok'
+2025-10-28 18:37:28,115 INFO Send command: 'land'
+2025-10-28 18:37:28,215 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:28,216 INFO Send command: 'land'
+2025-10-28 18:37:28,317 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:28,319 INFO Send command: 'land'
+2025-10-28 18:37:28,557 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:28,558 INFO Send command: 'land'
+2025-10-28 18:37:28,659 INFO Response land: 'unknown command: land`P'
+2025-10-28 18:37:28,659 INFO Done.
+2025-10-28 18:37:28,661 INFO Send command: 'land'
