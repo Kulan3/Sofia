@@ -1,0 +1,43 @@
+2025-11-06 17:34:23,515 INFO Logging to logs\flight_20251106_173423.log
+2025-11-06 17:34:23,516 INFO Altitude 90 cm, speed 30 cm/s
+2025-11-06 17:34:23,517 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-11-06 17:34:23,518 INFO Connecting (attempt 1/4)...
+2025-11-06 17:34:23,520 INFO Send command: 'command'
+2025-11-06 17:34:23,621 INFO Response command: 'ok'
+2025-11-06 17:34:23,672 INFO Battery 52%
+2025-11-06 17:34:23,727 INFO Send command: 'streamon'
+2025-11-06 17:34:23,830 INFO Response streamon: 'ok'
+2025-11-06 17:34:26,168 INFO Send command: 'speed 30'
+2025-11-06 17:34:26,274 INFO Response speed 30: 'ok'
+2025-11-06 17:34:26,279 INFO Takeoff.
+2025-11-06 17:34:26,285 INFO Send command: 'takeoff'
+2025-11-06 17:34:31,202 INFO Response takeoff: 'ok'
+2025-11-06 17:34:31,703 INFO Hovering for IMU stabilization (2.0s).
+2025-11-06 17:34:33,705 INFO     climb chunk 1: 40 cm (rem 30)
+2025-11-06 17:34:33,708 INFO Send command: 'up 40'
+2025-11-06 17:34:36,466 INFO Response up 40: 'ok'
+2025-11-06 17:34:36,666 INFO Send command: 'up 30'
+2025-11-06 17:34:38,875 INFO Response up 30: 'ok'
+2025-11-06 17:34:39,076 INFO [0] turn -90 deg
+2025-11-06 17:34:39,077 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-11-06 17:34:39,278 INFO     turn chunk 1: CW 45 deg (rem 45)
+2025-11-06 17:34:39,280 INFO Send command: 'cw 45'
+2025-11-06 17:34:40,683 INFO Response cw 45: 'ok'
+2025-11-06 17:34:40,884 INFO Send command: 'cw 45'
+2025-11-06 17:34:42,189 INFO Response cw 45: 'ok'
+2025-11-06 17:34:42,390 INFO [0] forward total 42 cm
+2025-11-06 17:34:42,391 INFO Send command: 'forward 42'
+2025-11-06 17:34:44,599 INFO Response forward 42: 'ok'
+2025-11-06 17:34:44,800 INFO [1] turn +4 deg
+2025-11-06 17:34:44,802 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-11-06 17:34:45,002 INFO Send command: 'ccw 4'
+2025-11-06 17:34:45,506 INFO Response ccw 4: 'ok'
+2025-11-06 17:34:45,708 INFO [1] forward total 48 cm
+2025-11-06 17:34:45,711 INFO Send command: 'forward 48'
+2025-11-06 17:34:48,322 INFO Response forward 48: 'ok'
+2025-11-06 17:34:48,523 INFO Mission complete. Landing.
+2025-11-06 17:34:48,525 INFO Send command: 'land'
+2025-11-06 17:34:53,441 INFO Response land: 'ok'
+2025-11-06 17:35:10,559 INFO Send command: 'streamoff'
+2025-11-06 17:35:10,660 INFO Response streamoff: 'ok'
+2025-11-06 17:35:10,660 INFO Done.

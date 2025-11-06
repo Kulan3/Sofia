@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # =========================
@@ -87,13 +88,21 @@ APPROACH_FWD_CM    = 40      # cm per forward step (legacy)
 APPROACH_MAX_STEPS = 15      # failsafe loop limit for old policies
 HOLD_SECS          = 6.0     # dwell time when aligned on target
 VERTICAL_STEP_CM   = 20      # cm per vertical correction during approach
-FORWARD_APPROACH_STEP_CM = 30  # cm per forward move while closing distance
+FORWARD_APPROACH_STEP_CM = 60  # cm per forward move while closing distance
 APPROACH_DISTANCE_TOL_CM = 5   # acceptable +/- distance band
 APPROACH_TIMEOUT_S       = 30  # give up approaching after this many seconds
+APPROACH_LOST_MS         = 1200  # grace period without detection during approach
 
 # Optional recording (set path or None)
-VIDEO_SAVE_PATH    = "C:/Users/nutth/Desktop/Sofia/Video/test.mp4"
+_DEFAULT_VIDEO_DIR = Path(__file__).resolve().parent / "videos"
+_VIDEO_DIR_ENV     = os.environ.get("TELLO_VIDEO_DIR")
+if _VIDEO_DIR_ENV:
+    base_video_dir = Path(_VIDEO_DIR_ENV).expanduser()
+else:
+    base_video_dir = _DEFAULT_VIDEO_DIR
+VIDEO_SAVE_PATH    = str((base_video_dir / "capture2.mp4").resolve())
 VIDEO_CODEC        = "mp4v"
+VIDEO_FPS          = 60
 TELLO_FRAME_RGB    = True   # djitellopy delivers BGR frames; set True only if frames are already RGB
 ASYNC_FRAME_HZ     = 12      # background frame polling rate when stream is on
 
@@ -104,7 +113,7 @@ DRIFT_CORRECT_MAX_DEG = 10   # clamp correction magnitude per adjustment
 # Target specifications: real width (meters) and desired standoff distance (meters)
 TARGET_SPECS = {
     "bottle": {
-        "real_width_m": 0.046,
-        "approach_distance_m": 0.30,
+        "real_width_m": 0.066,
+        "approach_distance_m": 0.70,
     }
 }

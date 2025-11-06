@@ -99,6 +99,15 @@ def log_ai(msg: str) -> None:
         AI_LOGGER.info(msg)
 
 
+def set_detector_status(detector: Optional[FireDetector], message: str) -> None:
+    """Update detector overlay/status text if available."""
+    if detector and hasattr(detector, "set_status"):
+        try:
+            detector.set_status(message)
+        except Exception:
+            pass
+
+
 def _is_imu_error(exc: Exception) -> bool:
     msg = str(exc).lower()
     return "no valid imu" in msg or "not joystick" in msg
@@ -447,6 +456,10 @@ def _pixels_to_strafe_cm(dx: float, distance_m: Optional[float]) -> int:
     return int(round(ratio * baseline))
 
 
+
+
+
+
 def engage_target(
     t: Tello,
     detector: FireDetector,
@@ -460,7 +473,7 @@ def engage_target(
     label = (initial_det.label or "fire").lower()
     spec = C.TARGET_SPECS.get(label, C.TARGET_SPECS.get("fire"))
     if not spec:
-        log_ai("No spec for target '{}'; skipping engagement".format(label))
+        log_ai("No spec for target '{}' ; skipping engagement".format(label))
         return
 
     desired_distance_m = float(spec.get("approach_distance_m", 0.3) or 0.3)
@@ -494,193 +507,110 @@ def engage_target(
                 return None
             time.sleep(0.05)
 
+    initial_yaw = get_current_yaw(t)
+    total_forward_cm = 0
+
     plan_det = initial_det if initial_det.has_fire and (initial_det.label == label or initial_det.label is None) else None
     if plan_det is None or plan_det.bbox is None:
         plan_det = fetch_detection(max_wait_s=1.0, require_target=True)
-
     if plan_det is None or not plan_det.has_fire or plan_det.bbox is None:
         log_ai("Unable to confirm target for planning; aborting engagement")
         return
 
-    distance_m = _estimate_distance_m(plan_det, spec)
-    yaw_total_deg = int(round(_pixels_to_yaw_deg(plan_det.dx)))
-    vertical_total_cm = _pixels_to_vertical_cm(plan_det.dy, distance_m)
-    strafe_total_cm = _pixels_to_strafe_cm(plan_det.dx, distance_m)
-    forward_total_cm = 0
+    def yaw_to_center(det: FireDetection) -> None:
+        dx = det.dx
+        yaw_step = int(round(_pixels_to_yaw_deg(dx)))
+        if abs(yaw_step) >= max(1, int(getattr(C, "MIN_TURN_DEG", 1))):
+            log_ai("Yaw to center target by {:+d} deg".format(yaw_step))
+            set_detector_status(detector, "Yaw {:+d} deg".format(yaw_step))
+            if yaw_step > 0:
+                try_cmd(t.rotate_clockwise, yaw_step, label="rotate_cw")
+            else:
+                try_cmd(t.rotate_counter_clockwise, -yaw_step, label="rotate_ccw")
+            time.sleep(C.TURN_SLEEP)
 
-    if vertical_total_cm != 0:
-        sign = 1 if vertical_total_cm > 0 else -1
-        vertical_total_cm = sign * max(
-            C.MIN_MOVE_CM,
-            min(C.MAX_MOVE_CM, abs(vertical_total_cm)),
-        )
+    yaw_to_center(plan_det)
 
-    if strafe_total_cm != 0:
-        sign = 1 if strafe_total_cm > 0 else -1
-        strafe_total_cm = sign * max(
-            C.MIN_MOVE_CM,
-            min(C.MAX_MOVE_CM, abs(strafe_total_cm)),
-        )
-
-    if distance_m is not None:
+    approach_success = False
+    start_time = time.time()
+    lost_grace = float(getattr(C, "APPROACH_LOST_MS", getattr(C, "FIRE_LOST_MS", 400))) / 1000.0
+    last_seen = time.time()
+    last_det = plan_det
+    while time.time() - start_time < float(getattr(C, "APPROACH_TIMEOUT_S", 30)):
+        det = fetch_detection(max_wait_s=0.5, require_target=False)
+        now = time.time()
+        if det and det.has_fire and (det.label == label or det.label is None):
+            last_det = det
+            last_seen = now
+        elif now - last_seen > lost_grace:
+            log_ai("Target lost during approach")
+            break
+        if last_det is None:
+            break
+        yaw_to_center(last_det)
+        distance_m = _estimate_distance_m(last_det, spec)
+        if distance_m is None:
+            pump_preview()
+            continue
         delta_m = distance_m - desired_distance_m
-        if delta_m > distance_tol_m:
-            forward_total_cm = int(round(delta_m * 100.0))
-        elif delta_m < -distance_tol_m:
-            log_ai(
-                "Already within stand-off distance (distance {:.2f} m <= {:.2f} m); no forward move.".format(
-                    distance_m, desired_distance_m
-                )
-            )
-    else:
-        log_ai("Distance estimate unavailable; skipping forward advance")
-
-    instructions: List[Tuple[str, int, str, str]] = []
-    initial_yaw = get_current_yaw(t)
-
-    def enqueue_turn(total_deg: int) -> None:
-        if total_deg == 0:
-            return
-        action = "rotate_clockwise" if total_deg > 0 else "rotate_counter_clockwise"
-        undo_action = "rotate_counter_clockwise" if total_deg > 0 else "rotate_clockwise"
-        remaining = abs(total_deg)
-        min_turn = max(1, int(getattr(C, "MIN_TURN_DEG", 1)))
-        chunk = int(getattr(C, "TURN_CHUNK_DEG", 0))
-        if chunk <= 0:
-            chunk = remaining
-        chunk = max(min_turn, chunk)
-        while remaining > 0:
-            step = min(chunk, remaining)
-            instructions.append((action, step, undo_action, f"{action.replace('_', ' ')} {step} deg"))
-            remaining -= step
-
-    def enqueue_strafe(total_cm: int) -> None:
-        if total_cm == 0:
-            return
-        action = "move_right" if total_cm > 0 else "move_left"
-        undo_action = "move_left" if total_cm > 0 else "move_right"
-        remaining = abs(total_cm)
-        min_move = max(C.MIN_MOVE_CM, 1)
-        chunk = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, int(getattr(C, "APPROACH_STRAFE_CM", C.MIN_MOVE_CM))))
-        while remaining >= min_move:
-            step = min(chunk, remaining)
-            instructions.append((action, step, undo_action, f"{action.replace('_', ' ')} {step} cm"))
-            remaining -= step
-
-    def enqueue_vertical(total_cm: int) -> None:
-        if total_cm == 0:
-            return
-        action = "move_down" if total_cm > 0 else "move_up"
-        undo_action = "move_up" if total_cm > 0 else "move_down"
-        remaining = abs(total_cm)
-        min_move = max(C.MIN_MOVE_CM, 1)
-        chunk = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, int(getattr(C, "VERTICAL_STEP_CM", C.MIN_MOVE_CM))))
-        while remaining >= min_move:
-            step = min(chunk, remaining)
-            instructions.append((action, step, undo_action, f"{action.replace('_', ' ')} {step} cm"))
-            remaining -= step
-
-    def enqueue_forward(total_cm: int) -> None:
-        if total_cm <= 0:
-            return
-        remaining = total_cm
-        step_len = max(C.MIN_MOVE_CM, int(getattr(C, "FORWARD_APPROACH_STEP_CM", C.FORWARD_STEP_CM)))
-        step_len = min(step_len, C.MAX_MOVE_CM)
-        while remaining >= C.MIN_MOVE_CM:
-            step = min(step_len, remaining)
-            instructions.append(("move_forward", step, "move_back", f"move forward {step} cm"))
-            remaining -= step
-
-    if abs(strafe_total_cm) >= C.MIN_MOVE_CM:
-        yaw_total_deg = 0
-
-    if abs(yaw_total_deg) >= max(1, int(getattr(C, "MIN_TURN_DEG", 1))):
-        enqueue_turn(yaw_total_deg)
-    else:
-        yaw_total_deg = 0
-
-    if abs(strafe_total_cm) >= C.MIN_MOVE_CM:
-        enqueue_strafe(strafe_total_cm)
-    else:
-        strafe_total_cm = 0
-
-    if abs(vertical_total_cm) >= C.MIN_MOVE_CM:
-        enqueue_vertical(vertical_total_cm)
-    else:
-        vertical_total_cm = 0
-
-    if forward_total_cm > 0:
-        enqueue_forward(forward_total_cm)
-
-    log_ai(
-        "Planned path -> yaw {:+d} deg, strafe {:+d} cm, vertical {:+d} cm, forward {} cm".format(
-            yaw_total_deg, strafe_total_cm, vertical_total_cm, forward_total_cm
-        )
-    )
-
-    undo_cmds: List[Tuple[str, int]] = []
-    success = True
-
-    for action, value, undo_action, desc in instructions:
-        command = getattr(t, action, None)
-        if command is None:
-            log_w("Unknown action '{}' in plan".format(action))
-            success = False
+        if abs(delta_m) <= distance_tol_m:
+            log_ai("Reached stand-off distance at {:.2f} m".format(distance_m))
+            approach_success = True
             break
+        step_cm = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, int(round(delta_m * 100.0))))
+        step_limit = int(getattr(C, "FORWARD_APPROACH_STEP_CM", 30))
+        if step_limit > 0:
+            step_cm = max(C.MIN_MOVE_CM, min(step_cm, step_limit))
+        log_ai("Forward {} cm towards target (distance {:.2f} m)".format(step_cm, distance_m))
+        set_detector_status(detector, "Forward {} cm".format(step_cm))
+        try_cmd(t.move_forward, step_cm, label="move_forward")
+        total_forward_cm += step_cm
+        time.sleep(C.MOVE_SLEEP)
         pump_preview()
-        log_ai(desc)
-        try:
-            try_cmd(command, value, label=action)
-            undo_cmds.append((undo_action, value))
-        except Exception as exc:
-            log_ai("{} failed: {}".format(action, exc))
-            success = False
-            break
-        time.sleep(C.TURN_SLEEP if action.startswith("rotate") else C.MOVE_SLEEP)
 
-    if success:
-        post_det = fetch_detection(max_wait_s=1.0, require_target=True)
-        if post_det and post_det.has_fire and (post_det.label == label or post_det.label is None):
-            log_ai("Holding position until target lost")
-            grace_s = max(0.2, float(getattr(C, "FIRE_LOST_MS", 400)) / 1000.0)
-            max_hold = float(getattr(C, "MAX_HOLD_SECS", 0.0) or 0.0)
-            hold_start = time.time()
-            last_visible = time.time()
-            while True:
-                pump_preview()
-                time.sleep(0.2)
-                if max_hold > 0 and (time.time() - hold_start) >= max_hold:
-                    log_ai("Hold timeout reached; returning to route")
-                    break
-                check_det = fetch_detection(max_wait_s=0.2, require_target=False)
-                if check_det and check_det.has_fire and (check_det.label == label or check_det.label is None):
-                    last_visible = time.time()
-                    continue
-                if time.time() - last_visible > grace_s:
-                    log_ai("Target lost; returning to route")
-                    break
-        else:
-            log_ai("Target not visible after executing path; returning")
-    else:
-        log_ai("Planned approach could not be completed; returning")
-
-    if undo_cmds:
-        log_ai("Returning to pre-engagement position")
-        for action, value in reversed(undo_cmds):
-            try:
-                command = getattr(t, action)
-            except AttributeError:
-                log_w("Unknown undo action '{}'".format(action))
+    if approach_success:
+        log_ai("Holding on target until lost")
+        set_detector_status(detector, "Holding target")
+        hold_grace = float(getattr(C, "FIRE_LOST_MS", 400)) / 1000.0
+        last_visible = time.time()
+        last_keepalive = time.time()
+        while True:
+            pump_preview()
+            time.sleep(0.2)
+            now = time.time()
+            if now - last_keepalive > 8.0:
+                try:
+                    t.send_command_without_return("command")
+                except Exception:
+                    pass
+                last_keepalive = now
+            det = fetch_detection(max_wait_s=0.2, require_target=False)
+            if det and det.has_fire and (det.label == label or det.label is None):
+                last_visible = now
                 continue
-            try_cmd(command, value, label=action)
-            time.sleep(C.TURN_SLEEP if action.startswith("rotate") else C.MOVE_SLEEP)
-        if initial_yaw is not None:
-            current_yaw = get_current_yaw(t)
-            if current_yaw is not None:
-                diff = _normalize_yaw(current_yaw - initial_yaw)
-                if abs(diff) >= max(1, int(getattr(C, "MIN_TURN_DEG", 1))):
-                    log_ai("Restoring heading by {:+.1f} deg".format(-diff))
-                    rotate_signed_deg(t, -diff)
+            if now - last_visible > hold_grace:
+                log_ai("Target lost; exiting hold")
+                break
+    else:
+        log_ai("Unable to reach desired distance; skipping hold")
+
+    if total_forward_cm > 0:
+        log_ai("Moving back {} cm to resume route".format(total_forward_cm))
+        set_detector_status(detector, "Retreat {} cm".format(total_forward_cm))
+        try_cmd(t.move_back, total_forward_cm, label="move_back")
+        time.sleep(C.MOVE_SLEEP)
+
+    if initial_yaw is not None:
+        current_yaw = get_current_yaw(t)
+        if current_yaw is not None:
+            yaw_error = _normalize_yaw(current_yaw - initial_yaw)
+            correction = _normalize_yaw(-yaw_error)
+            if abs(correction) >= max(1, int(getattr(C, "MIN_TURN_DEG", 1))):
+                log_ai("Restoring heading by {:+.1f} deg".format(correction))
+                set_detector_status(detector, "Restore heading")
+                rotate_signed_deg(t, correction)
+
+    set_detector_status(detector, "Returning to route")
 
 def main(json_path: str, show_video: bool) -> int:
     segs, meta = load_plan(json_path)
