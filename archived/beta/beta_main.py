@@ -531,48 +531,73 @@ def engage_target(
 
     yaw_to_center(plan_det)
 
+    distance_tol_cm = int(round(distance_tol_m * 100.0))
     approach_success = False
+    target_visible_on_finish = False
     start_time = time.time()
     lost_grace = float(getattr(C, "APPROACH_LOST_MS", getattr(C, "FIRE_LOST_MS", 400))) / 1000.0
     last_seen = time.time()
     last_det = plan_det
+    remaining_forward_cm = 0
+    initial_distance = _estimate_distance_m(plan_det, spec)
+    if initial_distance is not None:
+        remaining_forward_cm = max(0, int(round(max(0.0, initial_distance - desired_distance_m) * 100.0)))
+
     while time.time() - start_time < float(getattr(C, "APPROACH_TIMEOUT_S", 30)):
         det = fetch_detection(max_wait_s=0.5, require_target=False)
         now = time.time()
         if det and det.has_fire and (det.label == label or det.label is None):
             last_det = det
             last_seen = now
-        elif now - last_seen > lost_grace:
+            yaw_to_center(det)
+            distance_m = _estimate_distance_m(det, spec)
+            if distance_m is None:
+                continue
+            delta_m = distance_m - desired_distance_m
+            remaining_forward_cm = max(0, int(round(max(0.0, delta_m) * 100.0)))
+            if abs(delta_m) <= distance_tol_m:
+                log_ai("Reached stand-off distance at {:.2f} m".format(distance_m))
+                approach_success = True
+                target_visible_on_finish = True
+                break
+            step_cm = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, remaining_forward_cm))
+            step_limit = int(getattr(C, "FORWARD_APPROACH_STEP_CM", 30))
+            if step_limit > 0:
+                step_cm = max(C.MIN_MOVE_CM, min(step_cm, step_limit))
+            log_ai("Forward {} cm towards target (distance {:.2f} m)".format(step_cm, distance_m))
+            set_detector_status(detector, "Forward {} cm".format(step_cm))
+            try_cmd(t.move_forward, step_cm, label="move_forward")
+            total_forward_cm += step_cm
+            time.sleep(C.MOVE_SLEEP)
+            continue
+        else:
+            if now - last_seen <= lost_grace:
+                pump_preview()
+                continue
+            if remaining_forward_cm > distance_tol_cm:
+                step_limit = int(getattr(C, "FORWARD_APPROACH_STEP_CM", 30))
+                step_cm = max(C.MIN_MOVE_CM, remaining_forward_cm if step_limit <= 0 else min(remaining_forward_cm, step_limit))
+                log_ai("Blind forward {} cm (resume toward standoff)".format(step_cm))
+                set_detector_status(detector, "Forward {} cm (blind)".format(step_cm))
+                try_cmd(t.move_forward, step_cm, label="move_forward")
+                total_forward_cm += step_cm
+                remaining_forward_cm = max(0, remaining_forward_cm - step_cm)
+                time.sleep(C.MOVE_SLEEP)
+                if remaining_forward_cm <= distance_tol_cm:
+                    approach_success = True
+                    target_visible_on_finish = False
+                    break
+                continue
             log_ai("Target lost during approach")
             break
-        if last_det is None:
-            break
-        yaw_to_center(last_det)
-        distance_m = _estimate_distance_m(last_det, spec)
-        if distance_m is None:
-            pump_preview()
-            continue
-        delta_m = distance_m - desired_distance_m
-        if abs(delta_m) <= distance_tol_m:
-            log_ai("Reached stand-off distance at {:.2f} m".format(distance_m))
-            approach_success = True
-            break
-        step_cm = max(C.MIN_MOVE_CM, min(C.MAX_MOVE_CM, int(round(delta_m * 100.0))))
-        step_limit = int(getattr(C, "FORWARD_APPROACH_STEP_CM", 30))
-        if step_limit > 0:
-            step_cm = max(C.MIN_MOVE_CM, min(step_cm, step_limit))
-        log_ai("Forward {} cm towards target (distance {:.2f} m)".format(step_cm, distance_m))
-        set_detector_status(detector, "Forward {} cm".format(step_cm))
-        try_cmd(t.move_forward, step_cm, label="move_forward")
-        total_forward_cm += step_cm
-        time.sleep(C.MOVE_SLEEP)
         pump_preview()
 
-    if approach_success:
+    final_visible = target_visible_on_finish or (last_det is not None and (time.time() - last_seen) <= lost_grace)
+    if approach_success and final_visible:
         log_ai("Holding on target until lost")
         set_detector_status(detector, "Holding target")
         hold_grace = float(getattr(C, "FIRE_LOST_MS", 400)) / 1000.0
-        last_visible = time.time()
+        last_visible = last_seen
         last_keepalive = time.time()
         while True:
             pump_preview()
@@ -591,6 +616,8 @@ def engage_target(
             if now - last_visible > hold_grace:
                 log_ai("Target lost; exiting hold")
                 break
+    elif approach_success:
+        log_ai("Standoff reached but target not visible; skipping hold")
     else:
         log_ai("Unable to reach desired distance; skipping hold")
 

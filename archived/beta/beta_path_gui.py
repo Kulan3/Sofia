@@ -6,6 +6,7 @@ from pathlib import Path
 
 global CM_PER_PX, FLIGHT_SPEED, FLIGHT_HEIGHT
 global GRID_W_M, GRID_H_M, GRID_CELL_M
+global start_heading_deg
 # -------------------- Window & UI --------------------
 W, H     = 1000, 720
 PANEL_W  = 240
@@ -22,6 +23,8 @@ TEXT_COLOR  = (30,30,30)
 GHOST_COLOR = (40,40,40)
 
 BG_STEP_PX = 50            # background grid spacing (px)
+start_heading_deg = 0.0    # drone nose direction at takeoff (deg, 0 = +X/right)
+HEADING_STEP_DEG = 5.0
 
 # -------------------- Flight / Map Settings --------------------
 CM_PER_PX      = 3.0       # 1 px = 3 cm (edit in Settings)
@@ -74,27 +77,43 @@ def dist_cm_px(p0, p1):
     d_px = math.hypot(dx, dy)
     return int(round(px_to_cm(d_px))), d_px
 
-# angle (0..180) between lines (pos0->posref) and (pos1->posref)
-def get_angle_btw_line(pos0, pos1, posref):
-    ax = posref[0] - pos0[0]; ay = posref[1] - pos0[1]
-    bx = posref[0] - pos1[0]; by = posref[1] - pos1[1]
-    magA = math.hypot(ax, ay); magB = math.hypot(bx, by)
-    if magA == 0 or magB == 0: return 0
-    dot = (ax*bx + ay*by) / (magA*magB)
-    dot = max(-1.0, min(1.0, dot))
-    return int(round(math.degrees(math.acos(dot))))
+# vector helpers (match beta_plan.py)
+def _vec(a, b):
+    return (b[0] - a[0], b[1] - a[1])
 
-# signed turn at posref from (pos0->posref) to (pos1->posref); left/CCW positive
-def get_signed_angle_btw_line(pos0, pos1, posref):
-    ax = posref[0] - pos0[0]; ay = posref[1] - pos0[1]
-    bx = posref[0] - pos1[0]; by = posref[1] - pos1[1]
-    magA = math.hypot(ax, ay); magB = math.hypot(bx, by)
-    if magA == 0 or magB == 0: return 0
-    dot = (ax*bx + ay*by) / (magA*magB)
-    dot = max(-1.0, min(1.0, dot))
-    unsigned = math.degrees(math.acos(dot))
-    cross = ax*by - ay*bx
-    return int(round(unsigned if cross > 0 else (-unsigned if cross < 0 else 0)))
+def _dot(u, v):
+    return u[0]*v[0] + u[1]*v[1]
+
+def _cross2(u, v):
+    return u[0]*v[1] - u[1]*v[0]
+
+def _norm(u):
+    return math.hypot(u[0], u[1])
+
+def _angle_unsigned(u, v):
+    mu, mv = _norm(u), _norm(v)
+    if mu == 0 or mv == 0:
+        return 0.0
+    d = _dot(u, v) / (mu * mv)
+    d = max(-1.0, min(1.0, d))
+    return math.degrees(math.acos(d))
+
+def _angle_signed(u, v):
+    a = _angle_unsigned(u, v)
+    c = _cross2(u, v)
+    if c > 0:
+        return a
+    if c < 0:
+        return -a
+    return 0.0
+
+# angle (0..180) between (prev->curr) and (curr->next)
+def get_angle_btw_line(pos_prev, pos_next, pos_curr):
+    return int(round(_angle_unsigned(_vec(pos_prev, pos_curr), _vec(pos_curr, pos_next))))
+
+# signed turn at curr from prev->curr to curr->next (CCW positive)
+def get_signed_angle_btw_line(pos_prev, pos_next, pos_curr):
+    return int(round(_angle_signed(_vec(pos_prev, pos_curr), _vec(pos_curr, pos_next))))
 
 def points_equal(a,b): return a[0]==b[0] and a[1]==b[1]
 
@@ -134,6 +153,13 @@ def draw_centered_grid(surface):
         pygame.draw.line(surface, GRID_COLOR, (0, y), (W-PANEL_W, y), 1); y += step
 
     pygame.draw.circle(surface, CENTER_DOT, CENTER, 5)
+
+def _heading_to_screen(angle_deg, length):
+    rad = math.radians(angle_deg)
+    dx = math.cos(rad) * length
+    dy = -math.sin(rad) * length  # screen Y points down
+    return dx, dy
+
 
 def add_blink(pos):
     blink_fx.append({"pos": pos, "t0": pygame.time.get_ticks()})
@@ -275,6 +301,9 @@ def compute_segments(path_points):
         au = get_angle_btw_line(path_points[i-1], path_points[i+1], path_points[i])
         asg= get_signed_angle_btw_line(path_points[i-1], path_points[i+1], path_points[i])
         ang_u.append(int(au)); ang_s.append(int(asg))
+    if ang_s:
+        ang_s[0] = int(round(start_heading_deg))
+        ang_u[0] = abs(int(round(start_heading_deg)))
     return dcm, dpx, ang_u, ang_s
 
 # -------------------- Save / Load JSON (always in plans/) --------------------
@@ -288,6 +317,8 @@ def save_json_core(path_points, meta, filename="beta_waypoint.json"):
             "angle_deg": int(ang_u[i]) if i < len(ang_u) else 0,
             "turn_signed_deg": int(ang_s[i]) if i < len(ang_s) else 0
         })
+    if beta_waypoints:
+        beta_waypoints[0]["turn_signed_deg"] = int(round(start_heading_deg))
     data = {"wp": beta_waypoints, "pos": path_points, "meta": meta}
     out_path = (SAVE_DIR / filename)
     with open(out_path, "w", encoding="utf-8") as f:
@@ -438,11 +469,15 @@ while running:
     screen.blit(font.render(f"BG grid: {BG_STEP_PX}px approx. {bg_m:.2f} m", True, TEXT_COLOR), (10, 32))
     screen.blit(font.render(f"Total: {total_cm} cm ({total_cm/100:.2f} m)  ETA: {format_time(total_eta)}", True, TEXT_COLOR), (10, 52))
 
+    line_y = 72
     if mode == MODE_GRID and grid_path:
-        screen.blit(font.render(f"Grid: {GRID_W_M:.2f}×{GRID_H_M:.2f} m, cell {GRID_CELL_M:.2f} m, orient {GRID_ORIENT}", True, TEXT_COLOR), (10, 72))
+        screen.blit(font.render(f"Grid: {GRID_W_M:.2f}×{GRID_H_M:.2f} m, cell {GRID_CELL_M:.2f} m, orient {GRID_ORIENT}", True, TEXT_COLOR), (10, line_y))
+        line_y += 20
+    screen.blit(font.render(f"Start heading: {start_heading_deg:.1f}° ([ / ] adjust, \\ to reset)", True, TEXT_COLOR), (10, line_y))
+    line_y += 20
 
     if info_msg:
-        screen.blit(font.render(info_msg, True, (120,0,0)), (10, 94))
+        screen.blit(font.render(info_msg, True, (120,0,0)), (10, line_y))
 
     # right panel & buttons
     pygame.draw.rect(screen, (250,250,250), (W-PANEL_W, 0, PANEL_W, H))
@@ -542,7 +577,8 @@ while running:
                                 "speed_cm_s": FLIGHT_SPEED,
                                 "height_cm": FLIGHT_HEIGHT,
                                 "cm_per_px": CM_PER_PX,
-                                "center_px": CENTER
+                                "center_px": CENTER,
+                                "start_heading_deg": start_heading_deg
                             }
                             save_json(path_points, meta)
                         elif i == 8:  # Load JSON (from plans/)
@@ -551,7 +587,22 @@ while running:
                             back_to_base()
 
             elif e.type == pygame.KEYDOWN:
-                if   e.key == pygame.K_z:  # undo
+                if e.key == pygame.K_LEFTBRACKET:
+                    start_heading_deg = (start_heading_deg - HEADING_STEP_DEG) % 360.0
+                    info_msg = f"Start heading set to {start_heading_deg:.1f}°"
+                elif e.key == pygame.K_RIGHTBRACKET:
+                    start_heading_deg = (start_heading_deg + HEADING_STEP_DEG) % 360.0
+                    info_msg = f"Start heading set to {start_heading_deg:.1f}°"
+                elif e.key == pygame.K_BACKSLASH:
+                    start_heading_deg = 0.0
+                    info_msg = "Start heading reset to 0°"
+                elif e.key == pygame.K_COMMA:
+                    start_heading_deg = (start_heading_deg - 1.0) % 360.0
+                    info_msg = f"Start heading set to {start_heading_deg:.1f}°"
+                elif e.key == pygame.K_PERIOD:
+                    start_heading_deg = (start_heading_deg + 1.0) % 360.0
+                    info_msg = f"Start heading set to {start_heading_deg:.1f}°"
+                elif   e.key == pygame.K_z:  # undo
                     if mode == MODE_FREE and points: redo_stack.append(points.pop())
                 elif e.key == pygame.K_y:  # redo
                     if mode == MODE_FREE and redo_stack: points.append(redo_stack.pop())
