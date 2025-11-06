@@ -1,0 +1,71 @@
+2025-10-29 18:53:48,334 INFO Logging to logs\flight_20251029_185348.log
+2025-10-29 18:53:48,335 INFO Altitude 90 cm, speed 30 cm/s
+2025-10-29 18:53:48,336 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 18:53:48,337 INFO Connecting (attempt 1/4)...
+2025-10-29 18:53:48,338 INFO Send command: 'command'
+2025-10-29 18:53:48,439 INFO Response command: 'ok'
+2025-10-29 18:53:48,490 INFO Battery 46%
+2025-10-29 18:53:48,542 INFO Send command: 'streamon'
+2025-10-29 18:53:48,644 INFO Response streamon: 'ok'
+2025-10-29 18:53:50,898 INFO Send command: 'speed 30'
+2025-10-29 18:53:51,000 INFO Response speed 30: 'ok'
+2025-10-29 18:53:51,001 INFO Takeoff.
+2025-10-29 18:53:51,003 INFO Send command: 'takeoff'
+2025-10-29 18:53:59,938 INFO Response takeoff: 'ok'
+2025-10-29 18:54:00,439 INFO Hovering for IMU stabilization (2.0s).
+2025-10-29 18:54:02,440 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-29 18:54:02,440 INFO Send command: 'up 40'
+2025-10-29 18:54:03,945 INFO Response up 40: 'ok'
+2025-10-29 18:54:04,146 INFO Send command: 'up 30'
+2025-10-29 18:54:06,654 INFO Response up 30: 'ok'
+2025-10-29 18:54:06,855 INFO [0] turn +89 deg
+2025-10-29 18:54:06,856 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-29 18:54:07,056 INFO     turn chunk 1: CCW 45 deg (rem 44)
+2025-10-29 18:54:07,057 INFO Send command: 'ccw 45'
+2025-10-29 18:54:08,265 INFO Response ccw 45: 'ok'
+2025-10-29 18:54:08,465 INFO Send command: 'ccw 44'
+2025-10-29 18:54:09,570 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:09,571 INFO Send command: 'ccw 44'
+2025-10-29 18:54:09,671 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:09,672 INFO Send command: 'ccw 44'
+2025-10-29 18:54:09,773 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:09,775 INFO Send command: 'ccw 44'
+2025-10-29 18:54:09,876 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:09,878 WARNING rotate_ccw failed (Command 'ccw 44' was unsuccessful for 5 tries. Latest response:	'error Motor stop'); retry 1/2
+2025-10-29 18:54:10,078 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,179 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,180 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,281 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,282 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,382 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,383 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,383 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,384 WARNING rotate_ccw failed (Command 'ccw 44' was unsuccessful for 5 tries. Latest response:	'error Motor stop'); retry 2/2
+2025-10-29 18:54:10,584 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,585 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,585 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,786 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,787 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,888 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,889 INFO Send command: 'ccw 44'
+2025-10-29 18:54:10,990 INFO Response ccw 44: 'error Motor stop'
+2025-10-29 18:54:10,990 ERROR rotate_ccw failed after 3 tries: Command 'ccw 44' was unsuccessful for 5 tries. Latest response:	'error Motor stop'
+2025-10-29 18:54:10,990 ERROR Runtime error: Command 'ccw 44' was unsuccessful for 5 tries. Latest response:	'error Motor stop' - landing
+2025-10-29 18:54:10,992 INFO Send command: 'land'
+2025-10-29 18:54:11,093 INFO Response land: 'error'
+2025-10-29 18:54:11,094 INFO Send command: 'land'
+2025-10-29 18:54:11,195 INFO Response land: 'error'
+2025-10-29 18:54:11,197 INFO Send command: 'land'
+2025-10-29 18:54:11,297 INFO Response land: 'error'
+2025-10-29 18:54:11,298 INFO Send command: 'land'
+2025-10-29 18:54:11,399 INFO Response land: 'error'
+2025-10-29 18:54:11,400 WARNING land failed (Command 'land' was unsuccessful for 5 tries. Latest response:	'error'); retry 1/2
+2025-10-29 18:54:11,600 INFO Send command: 'land'
+2025-10-29 18:54:11,701 INFO Response land: 'error'
+2025-10-29 18:54:11,702 INFO Send command: 'land'
+2025-10-29 18:54:11,702 INFO Response land: 'ok'
+2025-10-29 18:54:11,841 INFO Send command: 'streamoff'
+2025-10-29 18:54:11,841 INFO Response streamoff: 'error'
+2025-10-29 18:54:11,842 INFO Send command: 'streamoff'
+2025-10-29 18:54:11,943 INFO Response streamoff: 'ok'
+2025-10-29 18:54:11,944 INFO Done.

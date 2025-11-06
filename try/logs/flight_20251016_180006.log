@@ -1,0 +1,21 @@
+2025-10-16 18:00:06,826 INFO Logging to logs/flight_20251016_180006.log
+2025-10-16 18:00:06,827 INFO Altitude 90 cm, speed 30 cm/s, AI=ON policy=1
+2025-10-16 18:00:06,828 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-16 18:00:06,828 INFO Connecting (attempt 1/4)...
+2025-10-16 18:00:06,830 INFO Send command: 'command'
+2025-10-16 18:00:06,931 INFO Response command: 'ok'
+2025-10-16 18:00:06,933 INFO Battery 40%
+2025-10-16 18:00:06,935 INFO Send command: 'streamon'
+2025-10-16 18:00:07,037 INFO Response streamon: 'ok'
+2025-10-16 18:00:07,039 INFO Send command: 'speed 30'
+2025-10-16 18:00:07,140 INFO Response speed 30: 'ok'
+2025-10-16 18:00:07,141 INFO Takeoff.
+2025-10-16 18:00:07,143 INFO Send command: 'takeoff'
+2025-10-16 18:00:13,175 INFO Response takeoff: 'ok'
+2025-10-16 18:00:13,676 INFO Hovering for IMU stabilization (2.0s).
+2025-10-16 18:00:15,678 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-16 18:00:15,678 INFO Send command: 'up 40'
+2025-10-16 18:00:17,989 INFO Response up 40: 'ok'
+2025-10-16 18:00:18,190 INFO Send command: 'up 30'
+2025-10-16 18:00:20,403 INFO Response up 30: 'ok'
+2025-10-16 18:00:20,709 INFO Send command: 'land'

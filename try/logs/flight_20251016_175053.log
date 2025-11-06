@@ -1,0 +1,148 @@
+2025-10-16 17:50:53,145 INFO Logging to logs/flight_20251016_175053.log
+2025-10-16 17:50:53,145 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-16 17:50:53,147 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-16 17:50:53,147 INFO Connecting (attempt 1/4)...
+2025-10-16 17:50:53,149 INFO Send command: 'command'
+2025-10-16 17:50:53,250 INFO Response command: 'ok'
+2025-10-16 17:50:53,352 INFO Battery 94%
+2025-10-16 17:50:53,352 INFO Send command: 'speed 30'
+2025-10-16 17:50:53,353 INFO Response speed 30: 'ok'
+2025-10-16 17:50:53,353 INFO Takeoff.
+2025-10-16 17:50:53,356 INFO Send command: 'takeoff'
+2025-10-16 17:50:53,356 INFO Response takeoff: 'ok'
+2025-10-16 17:50:53,857 INFO Hovering for IMU stabilization (2.0s).
+2025-10-16 17:50:55,859 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-16 17:50:55,860 INFO Send command: 'up 40'
+2025-10-16 17:50:55,860 INFO Response up 40: 'ok'
+2025-10-16 17:50:56,062 INFO Send command: 'up 30'
+2025-10-16 17:50:56,465 INFO Response up 30: 'error Not joystick'
+2025-10-16 17:50:56,467 INFO Send command: 'up 30'
+2025-10-16 17:50:57,072 INFO Response up 30: 'error Not joystick'
+2025-10-16 17:50:57,074 INFO Send command: 'up 30'
+2025-10-16 17:50:57,778 INFO Response up 30: 'ok'
+2025-10-16 17:50:57,980 INFO [0] turn -1 deg
+2025-10-16 17:50:57,981 WARNING turn -1 deg below MIN_TURN_DEG (2); skipping.
+2025-10-16 17:50:57,981 INFO [0] forward total 153 cm
+2025-10-16 17:50:57,981 INFO Send command: 'forward 60'
+2025-10-16 17:50:59,190 INFO Response forward 60: 'ok'
+2025-10-16 17:50:59,392 INFO Send command: 'forward 60'
+2025-10-16 17:51:03,117 INFO Response forward 60: 'ok'
+2025-10-16 17:51:03,318 INFO Send command: 'forward 33'
+2025-10-16 17:51:05,635 INFO Response forward 33: 'ok'
+2025-10-16 17:51:05,837 INFO [1] turn +91 deg
+2025-10-16 17:51:05,838 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-16 17:51:06,040 INFO     turn chunk 1: CCW 45 deg (rem 46)
+2025-10-16 17:51:06,040 INFO Send command: 'ccw 45'
+2025-10-16 17:51:07,249 INFO Response ccw 45: 'ok'
+2025-10-16 17:51:07,451 INFO     turn chunk 2: CCW 45 deg (rem 1)
+2025-10-16 17:51:07,452 INFO Send command: 'ccw 45'
+2025-10-16 17:51:08,864 INFO Response ccw 45: 'ok'
+2025-10-16 17:51:09,066 INFO     turn chunk 3: CCW 1 deg (rem 0)
+2025-10-16 17:51:09,067 INFO Send command: 'ccw 1'
+2025-10-16 17:51:09,167 INFO Response ccw 1: 'ok'
+2025-10-16 17:51:09,369 INFO [1] forward total 141 cm
+2025-10-16 17:51:09,369 INFO Send command: 'forward 60'
+2025-10-16 17:51:13,099 INFO Response forward 60: 'ok'
+2025-10-16 17:51:13,301 INFO Send command: 'forward 60'
+2025-10-16 17:51:16,222 INFO Response forward 60: 'ok'
+2025-10-16 17:51:16,423 INFO Send command: 'forward 21'
+2025-10-16 17:51:18,537 INFO Response forward 21: 'ok'
+2025-10-16 17:51:18,739 INFO [2] turn +90 deg
+2025-10-16 17:51:18,740 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-16 17:51:18,941 INFO     turn chunk 1: CCW 45 deg (rem 45)
+2025-10-16 17:51:18,941 INFO Send command: 'ccw 45'
+2025-10-16 17:51:20,352 INFO Response ccw 45: 'ok'
+2025-10-16 17:51:20,553 INFO     turn chunk 2: CCW 45 deg (rem 0)
+2025-10-16 17:51:20,553 INFO Send command: 'ccw 45'
+2025-10-16 17:51:21,058 INFO Response ccw 45: 'ok'
+2025-10-16 17:51:21,260 INFO [2] forward total 150 cm
+2025-10-16 17:51:21,261 INFO Send command: 'forward 60'
+2025-10-16 17:51:21,563 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:21,565 INFO Send command: 'forward 60'
+2025-10-16 17:51:21,867 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:21,869 INFO Send command: 'forward 60'
+2025-10-16 17:51:22,172 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:22,173 WARNING move_forward failed (Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 1/5 (IMU not ready).
+2025-10-16 17:51:23,674 INFO Send command: 'forward 60'
+2025-10-16 17:51:23,978 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:23,979 INFO Send command: 'forward 60'
+2025-10-16 17:51:24,281 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:24,284 INFO Send command: 'forward 60'
+2025-10-16 17:51:24,587 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:24,589 WARNING move_forward failed (Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 2/5 (IMU not ready).
+2025-10-16 17:51:26,090 INFO Send command: 'forward 60'
+2025-10-16 17:51:26,393 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:26,395 INFO Send command: 'forward 60'
+2025-10-16 17:51:26,698 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:26,700 INFO Send command: 'forward 60'
+2025-10-16 17:51:27,003 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:27,004 WARNING move_forward failed (Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 3/5 (IMU not ready).
+2025-10-16 17:51:28,504 INFO Send command: 'forward 60'
+2025-10-16 17:51:28,808 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:28,810 INFO Send command: 'forward 60'
+2025-10-16 17:51:29,113 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:29,114 INFO Send command: 'forward 60'
+2025-10-16 17:51:29,415 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:29,417 WARNING move_forward failed (Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 4/5 (IMU not ready).
+2025-10-16 17:51:30,917 INFO Send command: 'forward 60'
+2025-10-16 17:51:31,220 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:31,222 INFO Send command: 'forward 60'
+2025-10-16 17:51:31,525 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:31,527 INFO Send command: 'forward 60'
+2025-10-16 17:51:31,830 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:31,831 WARNING move_forward failed (Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 5/5 (IMU not ready).
+2025-10-16 17:51:33,332 INFO Send command: 'forward 60'
+2025-10-16 17:51:33,635 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:33,637 INFO Send command: 'forward 60'
+2025-10-16 17:51:33,940 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:33,942 INFO Send command: 'forward 60'
+2025-10-16 17:51:34,244 INFO Response forward 60: 'error No valid imu'
+2025-10-16 17:51:34,245 ERROR move_forward failed after 6 tries: Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'
+2025-10-16 17:51:34,246 WARNING move_forward(60) failed; skipping remaining distance: Command 'forward 60' was unsuccessful for 4 tries. Latest response:	'error No valid imu'
+2025-10-16 17:51:34,246 INFO [3] turn +91 deg
+2025-10-16 17:51:34,246 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-16 17:51:34,448 INFO     turn chunk 1: CCW 45 deg (rem 46)
+2025-10-16 17:51:34,449 INFO Send command: 'ccw 45'
+2025-10-16 17:51:34,752 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:34,754 INFO Send command: 'ccw 45'
+2025-10-16 17:51:35,056 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:35,058 INFO Send command: 'ccw 45'
+2025-10-16 17:51:35,359 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:35,360 WARNING rotate_ccw failed (Command 'ccw 45' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 1/5 (IMU not ready).
+2025-10-16 17:51:36,862 INFO Send command: 'ccw 45'
+2025-10-16 17:51:37,165 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:37,167 INFO Send command: 'ccw 45'
+2025-10-16 17:51:37,469 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:37,471 INFO Send command: 'ccw 45'
+2025-10-16 17:51:37,471 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:37,472 WARNING rotate_ccw failed (Command 'ccw 45' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 2/5 (IMU not ready).
+2025-10-16 17:51:38,973 INFO Send command: 'ccw 45'
+2025-10-16 17:51:38,974 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:38,976 INFO Send command: 'ccw 45'
+2025-10-16 17:51:39,279 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:39,280 INFO Send command: 'ccw 45'
+2025-10-16 17:51:39,583 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:39,584 WARNING rotate_ccw failed (Command 'ccw 45' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 3/5 (IMU not ready).
+2025-10-16 17:51:41,085 INFO Send command: 'ccw 45'
+2025-10-16 17:51:41,387 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:41,389 INFO Send command: 'ccw 45'
+2025-10-16 17:51:41,692 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:41,694 INFO Send command: 'ccw 45'
+2025-10-16 17:51:41,997 INFO Response ccw 45: 'error No valid imu'
+2025-10-16 17:51:41,998 WARNING rotate_ccw failed (Command 'ccw 45' was unsuccessful for 4 tries. Latest response:	'error No valid imu'); retry 4/5 (IMU not ready).
+2025-10-16 17:51:43,308 ERROR KeyboardInterrupt - landing
+2025-10-16 17:51:43,309 INFO Send command: 'land'
+2025-10-16 17:51:43,410 INFO Response land: 'error'
+2025-10-16 17:51:43,412 INFO Send command: 'land'
+2025-10-16 17:51:43,513 INFO Response land: 'error'
+2025-10-16 17:51:43,515 INFO Send command: 'land'
+2025-10-16 17:51:43,616 INFO Response land: 'error'
+2025-10-16 17:51:43,617 WARNING land error: Command 'land' was unsuccessful for 4 tries. Latest response:	'error'
+2025-10-16 17:51:43,620 INFO Send command: 'land'
+2025-10-16 17:51:43,722 INFO Response land: 'error'
+2025-10-16 17:51:43,724 INFO Send command: 'land'
+2025-10-16 17:51:43,825 INFO Response land: 'error'
+2025-10-16 17:51:43,826 INFO Send command: 'land'
+2025-10-16 17:51:43,927 INFO Response land: 'error'
+2025-10-16 17:51:43,928 INFO Done.
+2025-10-16 17:51:43,931 INFO Send command: 'land'

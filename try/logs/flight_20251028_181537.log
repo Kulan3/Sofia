@@ -1,0 +1,23 @@
+2025-10-28 18:15:37,528 INFO Logging to logs/flight_20251028_181537.log
+2025-10-28 18:15:37,529 INFO Altitude 90 cm, speed 30 cm/s, AI=ON policy=2
+2025-10-28 18:15:37,531 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-28 18:15:37,531 INFO Connecting (attempt 1/4)...
+2025-10-28 18:15:37,534 INFO Send command: 'command'
+2025-10-28 18:15:37,635 INFO Response command: 'ok'
+2025-10-28 18:15:37,636 INFO Battery 45%
+2025-10-28 18:15:37,638 INFO Send command: 'streamon'
+2025-10-28 18:15:37,738 INFO Response streamon: 'ok'
+2025-10-28 18:15:42,984 INFO Send command: 'speed 30'
+2025-10-28 18:15:43,086 INFO Response speed 30: 'ok'
+2025-10-28 18:15:43,087 INFO Takeoff.
+2025-10-28 18:15:43,090 INFO Send command: 'takeoff'
+2025-10-28 18:15:51,905 INFO Response takeoff: 'ok'
+2025-10-28 18:15:52,406 INFO Hovering for IMU stabilization (2.0s).
+2025-10-28 18:15:54,409 INFO     climb chunk 1: 40 cm (rem 30)
+2025-10-28 18:15:54,411 INFO Send command: 'up 40'
+2025-10-28 18:15:56,515 INFO Response up 40: 'ok'
+2025-10-28 18:15:56,717 INFO Send command: 'up 30'
+2025-10-28 18:15:59,423 INFO Response up 30: 'ok'
+2025-10-28 18:16:00,019 INFO Send command: 'land'
+2025-10-28 18:16:07,032 WARNING Aborting command 'land'. Did not receive a response after 7 seconds
+2025-10-28 18:16:07,033 INFO Send command: 'land'

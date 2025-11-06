@@ -1,0 +1,44 @@
+2025-10-20 20:38:48,286 INFO Logging to logs/flight_20251020_203848.log
+2025-10-20 20:38:48,287 INFO Altitude 90 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-20 20:38:48,288 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-20 20:38:48,288 INFO Connecting (attempt 1/4)...
+2025-10-20 20:38:48,290 INFO Send command: 'command'
+2025-10-20 20:38:55,311 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:38:55,311 INFO Send command: 'command'
+2025-10-20 20:39:02,334 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:02,334 INFO Send command: 'command'
+2025-10-20 20:39:09,357 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:09,358 INFO Send command: 'command'
+2025-10-20 20:39:16,380 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:16,381 WARNING connect error: Command 'command' was unsuccessful for 5 tries. Latest response:	'Aborting command 'command'. Did not receive a response after 7 seconds'
+2025-10-20 20:39:17,382 INFO Connecting (attempt 2/4)...
+2025-10-20 20:39:17,382 INFO Send command: 'command'
+2025-10-20 20:39:24,406 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:24,406 INFO Send command: 'command'
+2025-10-20 20:39:31,431 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:31,431 INFO Send command: 'command'
+2025-10-20 20:39:38,455 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:38,455 INFO Send command: 'command'
+2025-10-20 20:39:45,479 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:45,479 WARNING connect error: Command 'command' was unsuccessful for 5 tries. Latest response:	'Aborting command 'command'. Did not receive a response after 7 seconds'
+2025-10-20 20:39:46,480 INFO Connecting (attempt 3/4)...
+2025-10-20 20:39:46,480 INFO Send command: 'command'
+2025-10-20 20:39:53,503 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:39:53,503 INFO Send command: 'command'
+2025-10-20 20:40:00,526 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:00,527 INFO Send command: 'command'
+2025-10-20 20:40:07,547 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:07,548 INFO Send command: 'command'
+2025-10-20 20:40:14,573 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:14,573 WARNING connect error: Command 'command' was unsuccessful for 5 tries. Latest response:	'Aborting command 'command'. Did not receive a response after 7 seconds'
+2025-10-20 20:40:15,574 INFO Connecting (attempt 4/4)...
+2025-10-20 20:40:15,574 INFO Send command: 'command'
+2025-10-20 20:40:22,597 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:22,598 INFO Send command: 'command'
+2025-10-20 20:40:29,621 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:29,622 INFO Send command: 'command'
+2025-10-20 20:40:36,646 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:36,646 INFO Send command: 'command'
+2025-10-20 20:40:43,670 WARNING Aborting command 'command'. Did not receive a response after 7 seconds
+2025-10-20 20:40:43,670 WARNING connect error: Command 'command' was unsuccessful for 5 tries. Latest response:	'Aborting command 'command'. Did not receive a response after 7 seconds'
+2025-10-20 20:40:44,671 ERROR Unable to connect. Check TELLO Wi-Fi / power / close other Tello apps.

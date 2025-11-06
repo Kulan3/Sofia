@@ -1,0 +1,41 @@
+2025-10-29 17:05:17,279 INFO Logging to logs/flight_20251029_170517.log
+2025-10-29 17:05:17,280 INFO Altitude 70 cm, speed 20 cm/s, AI=ON policy=2
+2025-10-29 17:05:17,281 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-29 17:05:17,282 INFO Connecting (attempt 1/4)...
+2025-10-29 17:05:17,284 INFO Send command: 'command'
+2025-10-29 17:05:17,385 INFO Response command: 'ok'
+2025-10-29 17:05:17,436 INFO Battery 79%
+2025-10-29 17:05:17,489 INFO Send command: 'streamon'
+2025-10-29 17:05:17,591 INFO Response streamon: 'ok'
+2025-10-29 17:05:19,872 INFO Send command: 'speed 20'
+2025-10-29 17:05:19,977 INFO Response speed 20: 'ok'
+2025-10-29 17:05:19,978 INFO Takeoff.
+2025-10-29 17:05:19,981 INFO Send command: 'takeoff'
+2025-10-29 17:05:28,839 INFO Response takeoff: 'ok'
+2025-10-29 17:05:29,340 INFO Hovering for IMU stabilization (2.0s).
+2025-10-29 17:05:31,342 INFO     climb chunk 1: 40 cm (rem 10)
+2025-10-29 17:05:31,343 INFO Send command: 'up 40'
+2025-10-29 17:05:34,864 INFO Response up 40: 'error No valid imu'
+2025-10-29 17:05:34,866 INFO Send command: 'up 40'
+2025-10-29 17:05:35,570 INFO Response up 40: 'error Not joystick'
+2025-10-29 17:05:35,572 INFO Send command: 'up 40'
+2025-10-29 17:05:37,885 INFO Response up 40: 'ok'
+2025-10-29 17:05:38,087 INFO Send command: 'up 10'
+2025-10-29 17:05:38,189 INFO Response up 10: 'out of range'
+2025-10-29 17:05:38,191 INFO Send command: 'up 10'
+2025-10-29 17:05:38,292 INFO Response up 10: 'out of range'
+2025-10-29 17:05:38,294 INFO Send command: 'up 10'
+2025-10-29 17:05:38,396 INFO Response up 10: 'out of range'
+2025-10-29 17:05:38,398 INFO Send command: 'up 10'
+2025-10-29 17:05:38,499 INFO Response up 10: 'out of range'
+2025-10-29 17:05:38,499 WARNING move_up failed (Command 'up 10' was unsuccessful for 5 tries. Latest response:	'out of range'); retry 1/2
+2025-10-29 17:05:38,701 INFO Send command: 'up 10'
+2025-10-29 17:05:38,803 INFO Response up 10: 'out of range'
+2025-10-29 17:05:38,804 INFO Send command: 'up 10'
+2025-10-29 17:05:38,906 INFO Response up 10: 'out of range'
+2025-10-29 17:05:38,908 INFO Send command: 'up 10'
+2025-10-29 17:05:39,009 INFO Response up 10: 'out of range'
+2025-10-29 17:05:39,011 INFO Send command: 'up 10'
+2025-10-29 17:05:39,113 INFO Response up 10: 'out of range'
+2025-10-29 17:05:39,113 WARNING move_up failed (Command 'up 10' was unsuccessful for 5 tries. Latest response:	'out of range'); retry 2/2
+2025-10-29 17:05:39,263 INFO Send command: 'land'

@@ -1,6 +1,0 @@
-2025-10-15 03:11:53,816 INFO Logging to logs/flight_20251015_031153.log
-2025-10-15 03:11:53,817 INFO Altitude 90 cm, speed 30 cm/s, AI=ON policy=2
-2025-10-15 03:11:53,818 INFO Connecting (attempt 1/4) …
-2025-10-15 03:12:14,889 WARNING connect error: Command 'command' was unsuccessful for 4 tries. Latest response:	'Aborting command 'command'. Did not receive a response after 7 seconds'
-2025-10-15 03:12:15,889 INFO Connecting (attempt 2/4) …
-2025-10-15 03:12:36,964 WARNING connect error: Command 'command' was unsuccessful for 4 tries. Latest response:	'Aborting command 'command'. Did not receive a response after 7 seconds'

@@ -1,0 +1,50 @@
+2025-10-28 16:57:47,943 INFO Logging to logs/flight_20251028_165747.log
+2025-10-28 16:57:47,944 INFO Altitude 60 cm, speed 30 cm/s, AI=OFF policy=-
+2025-10-28 16:57:47,945 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-10-28 16:57:47,946 INFO Connecting (attempt 1/4)...
+2025-10-28 16:57:47,948 INFO Send command: 'command'
+2025-10-28 16:57:48,050 INFO Response command: 'ok'
+2025-10-28 16:57:48,101 INFO Battery 72%
+2025-10-28 16:57:48,153 INFO Send command: 'speed 30'
+2025-10-28 16:57:48,255 INFO Response speed 30: 'ok'
+2025-10-28 16:57:48,256 INFO Takeoff.
+2025-10-28 16:57:48,260 INFO Send command: 'takeoff'
+2025-10-28 16:57:57,215 INFO Response takeoff: 'ok'
+2025-10-28 16:57:57,717 INFO Hovering for IMU stabilization (2.0s).
+2025-10-28 16:57:59,719 INFO Send command: 'up 40'
+2025-10-28 16:58:02,035 INFO Response up 40: 'ok'
+2025-10-28 16:58:02,236 INFO [0] turn -87 deg
+2025-10-28 16:58:02,236 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 16:58:02,438 INFO     turn chunk 1: CW 45 deg (rem 42)
+2025-10-28 16:58:02,439 INFO Send command: 'cw 45'
+2025-10-28 16:58:03,847 INFO Response cw 45: 'ok'
+2025-10-28 16:58:04,049 INFO     turn chunk 2: CW 42 deg (rem 0)
+2025-10-28 16:58:04,050 INFO Send command: 'cw 42'
+2025-10-28 16:58:05,459 INFO Response cw 42: 'ok'
+2025-10-28 16:58:05,661 INFO [0] forward total 60 cm
+2025-10-28 16:58:05,661 INFO Send command: 'forward 60'
+2025-10-28 16:58:08,882 INFO Response forward 60: 'ok'
+2025-10-28 16:58:09,084 INFO [1] turn -90 deg
+2025-10-28 16:58:09,084 INFO Send command (no response expected): 'rc 0 0 0 0'
+2025-10-28 16:58:09,286 INFO     turn chunk 1: CW 45 deg (rem 45)
+2025-10-28 16:58:09,287 INFO Send command: 'cw 45'
+2025-10-28 16:58:10,696 INFO Response cw 45: 'ok'
+2025-10-28 16:58:10,898 INFO     turn chunk 2: CW 45 deg (rem 0)
+2025-10-28 16:58:10,898 INFO Send command: 'cw 45'
+2025-10-28 16:58:12,309 INFO Response cw 45: 'ok'
+2025-10-28 16:58:12,511 INFO [1] forward total 60 cm
+2025-10-28 16:58:12,512 INFO Send command: 'forward 60'
+2025-10-28 16:58:14,625 INFO Response forward 60: 'error No valid imu'
+2025-10-28 16:58:14,627 INFO Send command: 'forward 60'
+2025-10-28 16:58:14,930 INFO Response forward 60: 'error No valid imu'
+2025-10-28 16:58:14,931 INFO Send command: 'forward 60'
+2025-10-28 16:58:15,534 INFO Response forward 60: 'error Not joystick'
+2025-10-28 16:58:15,537 INFO Send command: 'forward 60'
+2025-10-28 16:58:21,857 ERROR KeyboardInterrupt - landing
+2025-10-28 16:58:21,858 INFO Send command: 'land'
+2025-10-28 16:58:22,159 INFO Response land: 'error Auto land'
+2025-10-28 16:58:22,161 INFO Send command: 'land'
+2025-10-28 16:58:29,205 WARNING Aborting command 'land'. Did not receive a response after 7 seconds
+2025-10-28 16:58:29,205 INFO Send command: 'land'
+2025-10-28 16:58:30,412 INFO Response land: 'ok'
+2025-10-28 16:58:30,412 INFO Done.
