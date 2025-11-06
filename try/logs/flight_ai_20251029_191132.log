@@ -1,6 +1,0 @@
-2025-10-29 19:11:57,188 Detected 'bottle' conf=0.53
-2025-10-29 19:11:57,254 Engaging target 'bottle' (conf=0.53)
-2025-10-29 19:11:57,254 Planned path -> yaw +34 deg, vertical +0 cm, forward 8 cm
-2025-10-29 19:11:57,254 rotate clockwise 34 deg
-2025-10-29 19:11:58,993 Holding position for 6.0s
-2025-10-29 19:12:05,309 Returning to pre-engagement position
