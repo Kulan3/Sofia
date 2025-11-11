@@ -1,0 +1,78 @@
+FROM nvcr.io/nvidia/l4t-ml:r35.2.1-py3
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONNOUSERSITE=1 \
+    OPENCV_VERSION=4.5.0 \
+    OPENCV_SRC=/tmp/opencv \
+    OPENCV_CONTRIB_SRC=/tmp/opencv_contrib
+
+# Base tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git git-lfs openssh-client python3-pygame \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Git LFS config (optional)
+RUN git lfs install --skip-repo && \
+    git config --global user.name "Kulan3" && \
+    git config --global user.email "nutthanondeeoam@gmail.com" && \
+    git config --global filter.lfs.clean "git-lfs clean -- %f" && \
+    git config --global filter.lfs.smudge "git-lfs smudge -- %f" && \
+    git config --global filter.lfs.process "git-lfs filter-process" && \
+    git config --global filter.lfs.required true
+
+# --- OpenCV hardening: remove any pip cv2 wheels so they can't shadow the CUDA build ---
+RUN rm -rf /usr/local/lib/python3.*/dist-packages/cv2* \
+           /usr/local/lib/python3.*/site-packages/cv2* || true \
+ && python3 -m pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python || true
+# ---------------------------------------------------------------------------------------
+
+# --- Build OpenCV 4.5.0 with CUDA (for Jetson Orin Nano: CUDA_ARCH_BIN=8.7) ---
+# If you're on Xavier NX use 7.2, Nano (original) 5.3.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential cmake git pkg-config \
+      libgtk-3-dev libavcodec-dev libavformat-dev libswscale-dev \
+      libjpeg-dev libpng-dev libtiff-dev \
+      libtbb2 libtbb-dev \
+      python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone --depth 1 -b ${OPENCV_VERSION} https://github.com/opencv/opencv.git ${OPENCV_SRC} && \
+    git clone --depth 1 -b ${OPENCV_VERSION} https://github.com/opencv/opencv_contrib.git ${OPENCV_CONTRIB_SRC} && \
+    mkdir -p ${OPENCV_SRC}/build && cd ${OPENCV_SRC}/build && \
+    cmake -D CMAKE_BUILD_TYPE=Release \
+          -D CMAKE_INSTALL_PREFIX=/usr/local \
+          -D OPENCV_EXTRA_MODULES_PATH=${OPENCV_CONTRIB_SRC}/modules \
+          -D WITH_CUDA=ON \
+          -D CUDA_FAST_MATH=ON \
+          -D WITH_CUDNN=ON \
+          -D OPENCV_DNN_CUDA=ON \
+          -D ENABLE_NEON=ON \
+          -D BUILD_opencv_python3=ON \
+          -D BUILD_TESTS=OFF \
+          -D BUILD_EXAMPLES=OFF \
+          -D CUDA_ARCH_BIN=8.7 \
+          .. && \
+    make -j"$(nproc)" && make install && ldconfig && \
+    rm -rf ${OPENCV_SRC} ${OPENCV_CONTRIB_SRC}
+# ---------------------------------------------------------------------------------------
+
+# Python deps (install WITHOUT deps so nothing pulls opencv-python)
+RUN python3 -m pip install --no-cache-dir --no-deps djitellopy==2.5.0 \
+ && python3 -m pip install --no-cache-dir --no-deps ultralytics==8.0.196
+
+# Build-time sanity check (should show CUDA: YES)
+RUN python3 - <<'PY'
+import cv2
+print('OpenCV:', cv2.__version__)
+print('cv2 path:', cv2.__file__)
+print('CUDA:', 'YES' if 'NVIDIA CUDA: YES' in cv2.getBuildInformation() else 'NO')
+# quick cue that the CUDA namespace exists:
+print('Has cv2.cuda? ->', any(n.startswith('cuda') for n in dir(cv2)))
+PY
+
+WORKDIR /opt/mydrone
+COPY try/ ./try/
+
+CMD ["/bin/bash"]
