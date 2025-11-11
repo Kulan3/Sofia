@@ -1,0 +1,5 @@
+2025-11-11 18:40:16,667 INFO Logging to logs\flight_20251111_184016.log
+2025-11-11 18:40:16,668 INFO Altitude 90 cm, speed 30 cm/s
+2025-11-11 18:40:16,669 INFO Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+2025-11-11 18:40:16,669 INFO Connecting (attempt 1/4)...
+2025-11-11 18:40:16,671 INFO Send command: 'command'
