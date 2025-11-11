@@ -1,0 +1,23 @@
+2025-11-07 19:09:52,915 Detected 'fire' conf=0.43
+2025-11-07 19:09:52,915 Engaging target 'fire' (conf=0.43)
+2025-11-07 19:09:52,915 Yaw to center target by +8 deg
+2025-11-07 19:09:54,429 Yaw to center target by +3 deg
+2025-11-07 19:09:55,133 Forward 60 cm towards target (distance 3.31 m)
+2025-11-07 19:10:01,042 Forward 60 cm towards target (distance 2.80 m)
+2025-11-07 19:10:06,663 Yaw to center target by +2 deg
+2025-11-07 19:10:06,966 Forward 60 cm towards target (distance 1.92 m)
+2025-11-07 19:10:12,775 Yaw to center target by +8 deg
+2025-11-07 19:10:13,679 Move down 20 cm (dy=56.4)
+2025-11-07 19:10:18,795 Yaw to center target by +7 deg
+2025-11-07 19:10:19,601 Move up 20 cm (dy=-54.9)
+2025-11-07 19:10:23,166 Yaw to center target by +2 deg
+2025-11-07 19:10:23,468 Forward 60 cm towards target (distance 1.66 m)
+2025-11-07 19:10:28,504 Yaw to center target by +11 deg
+2025-11-07 19:10:29,508 Move down 20 cm (dy=81.5)
+2025-11-07 19:10:33,825 Yaw to center target by +4 deg
+2025-11-07 19:10:34,427 Forward 60 cm towards target (distance 1.40 m)
+2025-11-07 19:10:39,198 Target lost during approach
+2025-11-07 19:10:39,198 Unable to reach desired distance; skipping hold
+2025-11-07 19:10:39,198 Ascending 20 cm to resume altitude
+2025-11-07 19:10:41,406 Moving back 300 cm to resume route
+2025-11-07 19:10:52,649 Restoring heading by -29.0 deg

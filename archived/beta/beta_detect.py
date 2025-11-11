@@ -4,7 +4,6 @@
 Simplified fire detection helper compatible with Python 3.8.
 Only performs YOLO inference and optional frame display/recording.
 """
-import os
 import threading
 import time
 from pathlib import Path
@@ -64,6 +63,9 @@ class FireDetector:
         self.last_seen_ts = 0.0
 
         self._video_writer = None
+        self._video_path = None  # type: Optional[Path]
+        self._video_writer_failed = False
+        self._video_log_once = False
         self._last_detection = FireDetection(False)
         self._lock = threading.Lock()
 
@@ -75,15 +77,65 @@ class FireDetector:
     # ------------------------------------------------------------------ #
     # Internal helpers
     # ------------------------------------------------------------------ #
+    def _next_video_path(self) -> Path:
+        """Resolve VIDEO_SAVE_PATH into an actual file target."""
+        raw_str = str(C.VIDEO_SAVE_PATH).strip()
+        raw_path = Path(raw_str).expanduser()
+        is_dir_hint = raw_str.endswith(("/", "\\")) or raw_path.exists() and raw_path.is_dir()
+
+        if not raw_path.suffix and not raw_path.exists():
+            # No extension provided; treat as directory for auto-naming.
+            is_dir_hint = True
+
+        if is_dir_hint:
+            base_dir = raw_path
+            base_dir.mkdir(parents=True, exist_ok=True)
+            timestamp = time.strftime("%Y%m%d_%H%M%S")
+            filename = f"capture_{timestamp}.mp4"
+            return base_dir / filename
+
+        target = raw_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        return target
+
     def _ensure_vwriter(self, frame_shape) -> None:
         if not C.VIDEO_SAVE_PATH:
             return
-        if self._video_writer is not None:
+        if self._video_writer is not None or self._video_writer_failed:
             return
-        os.makedirs(os.path.dirname(C.VIDEO_SAVE_PATH) or ".", exist_ok=True)
-        fourcc = cv2.VideoWriter_fourcc(*C.VIDEO_CODEC)
+        try:
+            target_path = self._next_video_path()
+        except Exception as exc:
+            if not self._video_log_once:
+                print(f"[FireDetector] Unable to prepare video path: {exc}")
+                self._video_log_once = True
+            self._video_writer_failed = True
+            return
+
         height, width = frame_shape[:2]
-        self._video_writer = cv2.VideoWriter(C.VIDEO_SAVE_PATH, fourcc, C.VIDEO_FPS, (width, height), True)
+        try:
+            fourcc = cv2.VideoWriter_fourcc(*C.VIDEO_CODEC)
+        except Exception as exc:
+            if not self._video_log_once:
+                print(f"[FireDetector] Invalid VIDEO_CODEC '{C.VIDEO_CODEC}': {exc}")
+                self._video_log_once = True
+            self._video_writer_failed = True
+            return
+
+        writer = cv2.VideoWriter(str(target_path), fourcc, C.VIDEO_FPS, (width, height), True)
+        if not writer or not writer.isOpened():
+            if writer:
+                writer.release()
+            if not self._video_log_once:
+                print(f"[FireDetector] OpenCV could not open '{target_path}' "
+                      f"(codec={C.VIDEO_CODEC}, size={width}x{height}). Recording disabled.")
+                self._video_log_once = True
+            self._video_writer_failed = True
+            return
+
+        self._video_writer = writer
+        self._video_path = target_path
+        print(f"[FireDetector] Recording video to {target_path}")
 
     def _display_frame(self, frame_bgr: np.ndarray) -> None:
         if self.show_video:
